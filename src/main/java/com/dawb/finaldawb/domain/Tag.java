@@ -40,6 +40,13 @@ public class Tag {
         actualizadoEn = Instant.now();
     }
 
+    public Tag() {
+    }
+
+    public Tag(String nombre) {
+        this.nombre = nombre;
+    }
+
     public Long getId() {
         return id;
     }

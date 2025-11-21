@@ -9,6 +9,8 @@
 
         <class>com.dawb.finaldawb.domain.Role</class>
         <class>com.dawb.finaldawb.domain.Usuario</class>
+        <class>com.dawb.finaldawb.domain.Lugar</class>
+
         <properties>
             <property name="jakarta.persistence.jdbc.driver" value="org.mariadb.jdbc.Driver" />
 
