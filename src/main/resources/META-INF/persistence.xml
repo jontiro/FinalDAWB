@@ -7,9 +7,21 @@
     <persistence-unit name="cocina-pu" transaction-type="RESOURCE_LOCAL">
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
 
+        <!-- Entidades -->
         <class>com.dawb.finaldawb.domain.Role</class>
         <class>com.dawb.finaldawb.domain.Usuario</class>
+        <class>com.dawb.finaldawb.domain.EstadoUsuario</class>
+        <class>com.dawb.finaldawb.domain.Receta</class>
+        <class>com.dawb.finaldawb.domain.RecetaPaso</class>
+        <class>com.dawb.finaldawb.domain.RecetaTag</class>
+        <class>com.dawb.finaldawb.domain.RecetaTagId</class>
+        <class>com.dawb.finaldawb.domain.Tag</class>
         <class>com.dawb.finaldawb.domain.Lugar</class>
+        <class>com.dawb.finaldawb.domain.Objeto</class>
+        <class>com.dawb.finaldawb.domain.Comentario</class>
+        <class>com.dawb.finaldawb.domain.Tipo</class>
+        <class>com.dawb.finaldawb.domain.Recomendacion</class>
+
 
         <properties>
             <property name="jakarta.persistence.jdbc.driver" value="org.mariadb.jdbc.Driver" />
@@ -27,6 +39,7 @@
             <property name="jakarta.persistence.schema-generation.database.action" value="none" />
 
             <property name="hibernate.show_sql" value="true" />
+
             <property name="hibernate.format_sql" value="true" />
         </properties>
     </persistence-unit>
