@@ -6,15 +6,19 @@ import java.time.Instant;
 import java.util.Objects;
 
 @Entity
-@Table(name = "tipos")
-public class Tipo {
+@Table(name = "objeto", uniqueConstraints = {
+        // Mapea la clave única en la descripción
+        @UniqueConstraint(name = "uk_objeto_descripcion", columnNames = "descripcion")
+})
+public class Objeto {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // Mapea a descripcion (VARCHAR(100) NOT NULL)
     @NotBlank
-    @Size(max = 20)
-    @Column(nullable = false, length = 20)
+    @Size(max = 100)
+    @Column(nullable = false, length = 100)
     private String descripcion;
 
     // Auditoría
@@ -73,8 +77,8 @@ public class Tipo {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Tipo tipo)) return false;
-        return Objects.equals(id, tipo.id);
+        if (!(o instanceof Objeto objeto)) return false;
+        return Objects.equals(id, objeto.id);
     }
 
     @Override
