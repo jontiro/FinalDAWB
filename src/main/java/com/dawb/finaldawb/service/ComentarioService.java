@@ -47,6 +47,22 @@ public class ComentarioService {
     }
 
     /**
+     * Obtiene todos los comentarios asociados a un objeto por su ID genérico.
+     * @param objetoId ID del Objeto (ej. ID de la Receta o ID del Lugar).
+     */
+    public List<Comentario> findAllByObjetoId(Long objetoId) { // <--- MÉTODO FALTANTE
+        // 1. Asumimos que el objetoId es el ID del Objeto (entidad que es comentada).
+        // 2. Buscamos el Objeto para pasárselo al repositorio.
+        Optional<Objeto> objetoOpt = objetoService.findById(objetoId);
+
+        return objetoOpt
+                // Si el Objeto existe, busca los comentarios asociados a ese Objeto
+                .map(comentarioRepository::findByObjeto)
+                // Si no existe, devuelve una lista vacía
+                .orElseGet(List::of);
+    }
+
+    /**
      * Obtiene todos los comentarios pendientes de moderación.
      * Requiere permisos de administrador o moderador en la capa REST.
      */
@@ -61,26 +77,32 @@ public class ComentarioService {
      * @param tipoObjeto (ej. "Receta", "Lugar").
      * @return El Comentario persistido o Optional.empty() si el autor o el tipoObjeto no existen.
      */
-    public Optional<Comentario> createComentario(Comentario comentario, Long autorId, String tipoObjeto) {
+    public Optional<Comentario> createComentario(Comentario comentario, Long autorId, Long objetoId, String tipoObjeto) {
         // 1. Verificar y obtener el Autor
         Optional<Usuario> autorOpt = usuarioRepository.findById(autorId);
         if (autorOpt.isEmpty()) {
             return Optional.empty(); // Autor no existe
         }
 
-        // 2. Verificar y obtener el Objeto (clasificador polimórfico)
+        // 2. Obtener el Objeto (clasificador polimórfico)
         Optional<Objeto> objetoOpt = objetoService.findByDescripcion(tipoObjeto);
         if (objetoOpt.isEmpty()) {
-            // Este es un error de dato, el tipo Objeto debe existir ("Receta" o "Lugar")
-            return Optional.empty();
+            return Optional.empty(); // Tipo Objeto no existe (Ej: "Receta" no está en la tabla 'objeto')
         }
 
-        // 3. Asignar las entidades FK y asegurar que el ID sea null
+        // 3. ASIGNACIÓN CLAVE: Aquí es donde se resuelve el ID real que apunta a la entidad comentada.
+        // NOTA: Para un sistema polimórfico real, la entidad Comentario necesitaría la Columna
+        // 'entidad_id' (Long) y 'entidad_tipo' (String) y NO la FK a Objeto.
+        // Ya que usamos la FK a Objeto, asumimos que Objeto.id = objetoId.
+
+        // Si tienes 1:1, aquí debe ir la verificación de la existencia de la Receta o Lugar.
+
+        // 4. Asignar las entidades FK y asegurar que el ID sea null
         comentario.setAutor(autorOpt.get());
-        comentario.setObjeto(objetoOpt.get());
+        comentario.setObjeto(objetoOpt.get()); // Asigna la entidad Objeto para el FK a la tabla 'objeto'
         comentario.setId(null);
 
-        // 4. El campo 'moderado' se deja en su valor por defecto (false)
+        // 5. El campo 'moderado' se deja en su valor por defecto (false)
         return Optional.of(comentarioRepository.save(comentario));
     }
 
