@@ -1,13 +1,15 @@
 package com.dawb.finaldawb.config;
 
 import jakarta.ws.rs.ApplicationPath;
-import jakarta.ws.rs.core.Application;
+import org.glassfish.jersey.server.ResourceConfig;
 
-// Define la URL base para todos los recursos REST.
-// Si el WAR se despliega como /FinalDAWB, la ruta será: /FinalDAWB/api/...
 @ApplicationPath("/api")
-public class RestApplication extends Application {
-    // Nota: En Jakarta EE moderno (usando CDI), no es necesario listar explícitamente
-    // los Resources (Controladores). CDI y JAX-RS los descubren automáticamente.
-    // Esta clase solo define la ruta base.
+public class RestApplication extends ResourceConfig {
+    public RestApplication() {
+        // Descubrimiento por paquete
+        packages("com.dawb.finaldawb.rest");
+        // Registros adicionales (solo aquí)
+        // register(com.dawb.finaldawb.auth.AuthFilter.class);
+        // register(org.glassfish.jersey.jackson.JacksonFeature.class);
+    }
 }

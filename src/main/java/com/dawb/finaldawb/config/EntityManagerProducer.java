@@ -13,7 +13,7 @@ public class EntityManagerProducer {
     @Produces
     @ApplicationScoped
     public EntityManagerFactory produceEntityManagerFactory() {
-        return Persistence.createEntityManagerFactory("default");
+        return Persistence.createEntityManagerFactory("cocina-pu");
     }
 
     @Produces

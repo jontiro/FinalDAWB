@@ -50,6 +50,13 @@
         </div>
     </div>
 
+    <!-- Botón de Diagnóstico -->
+    <div class="mt-8">
+        <h2 class="text-xl font-semibold mb-3 text-red-600">4. Diagnóstico de Conexión y Roles</h2>
+        <button id="diagnostico-btn" class="bg-red-500 text-white p-2 rounded-lg hover:bg-red-600 transition duration-150">Probar Conexión y Roles</button>
+    </div>
+
+
     <!-- Área de Resultados -->
     <div class="mt-10">
         <h2 class="text-2xl font-semibold mb-4 text-gray-800">Resultados y Salida JSON</h2>
@@ -59,15 +66,14 @@
 </div>
 
 <script>
-    // La URL base asume que el WAR se despliega como /FinalDAWB
-    const API_BASE_URL = "/FinalDAWB/api";
+    // CRÍTICO: La URL base debe coincidir con el Context Root del WAR
+    const API_BASE_URL = "/FinalDAWB-1.0-SNAPSHOT/api";
     const statusMessage = document.getElementById('status-message');
     const apiOutput = document.getElementById('api-output');
     const recipeCount = document.getElementById('recipe-count');
 
     // --- Funciones Auxiliares ---
 
-    /** Muestra un mensaje temporal de estado. */
     function showStatus(message, type = 'success') {
         const colors = {
             success: { bg: 'bg-green-100', text: 'text-green-700' },
@@ -80,15 +86,47 @@
 
         setTimeout(() => {
             statusMessage.classList.add('hidden');
-        }, 5000);
+        }, 8000);
     }
 
-    /** Muestra el JSON de salida en formato preformateado. */
     function displayJson(data) {
         apiOutput.textContent = JSON.stringify(data, null, 2);
     }
 
-    // --- Manejadores de Eventos ---
+    // --- Manejador de Diagnóstico de Conexión ---
+
+    document.getElementById('diagnostico-btn').addEventListener('click', async () => {
+        apiOutput.textContent = 'Probando conexión...';
+        try {
+            const response = await fetch(`${API_BASE_URL}/auth/diagnostico/roles`, {
+                method: 'GET',
+                headers: { 'Accept': 'application/json' }
+            });
+
+            const data = await response.json();
+            displayJson(data);
+
+            if (response.ok) {
+                showStatus(`Diagnóstico OK: Conexión a BD exitosa. Roles encontrados: ${data.join(', ')}`, 'success');
+            } else {
+                // El servidor HTTP 500 contendrá el JSON de error
+                const errorMessage = data.message || `Error ${response.status}: Revise los logs de Tomcat.`;
+
+                showStatus(`DIAGNÓSTICO FALLIDO: ${errorMessage}`, 'error');
+
+                // Si falla el parseo (otro 500, error en el servidor)
+                if (data.error === "PERSISTENCE_FAILURE") {
+                    showStatus(`FALLO DE PERSISTENCIA: ${data.message}. Causa más probable: MariaDB apagada o credenciales incorrectas.`, 'error');
+                }
+            }
+        } catch (error) {
+            showStatus(`ERROR CRÍTICO: No se pudo conectar al endpoint de diagnóstico.`, 'error');
+            apiOutput.textContent = `Error de red o JSON inválido: ${error.message}. Verifique el log de Tomcat.`;
+        }
+    });
+
+
+    // --- Manejadores de Eventos (Registro, Login, Recetas) ---
 
     document.getElementById('register-form').addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -111,10 +149,11 @@
             if (response.ok) {
                 showStatus(`Registro exitoso para ${username}! ID: ${data.id}`, 'success');
             } else {
+                // Si es 400, data.entity contendrá el mensaje de error de validación
                 showStatus(`Fallo en el registro: ${data.entity || response.statusText}`, 'error');
             }
         } catch (error) {
-            showStatus(`Error de conexión: ${error.message}`, 'error');
+            showStatus(`Error de conexión o JSON inválido: ${error.message}. ¿El servidor está enviando un error HTML 500?`, 'error');
         }
     });
 
@@ -137,12 +176,11 @@
 
             if (response.ok) {
                 showStatus(`Login exitoso para ${data.username}! Rol: ${data.role}`, 'success');
-                // En una app real, guardarías el token aquí
             } else {
                 showStatus(`Fallo de autenticación: ${data.entity || response.statusText}`, 'error');
             }
         } catch (error) {
-            showStatus(`Error de conexión: ${error.message}`, 'error');
+            showStatus(`Error de conexión o JSON inválido: ${error.message}`, 'error');
         }
     });
 
@@ -163,11 +201,12 @@
             showStatus(`Carga de recetas exitosa. ${data.length} resultados.`, 'success');
             recipeCount.textContent = `Total de recetas públicas encontradas: ${data.length}`;
         } catch (error) {
-            showStatus(`Error al cargar recetas: ${error.message}. Verifica que la BD y las tablas existan.`, 'error');
+            showStatus(`Error al cargar recetas: ${error.message}. Verifica la conexión.`, 'error');
             recipeCount.textContent = 'No se pudieron cargar las recetas.';
             apiOutput.textContent = 'Error: No se pudo conectar con el recurso /api/recetas.';
         }
     });
+
 </script>
 </body>
 </html>
