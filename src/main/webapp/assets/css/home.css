@@ -1,0 +1,36 @@
+/* home.css - Estilos para la página de inicio */
+}
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+.stat-card {
+
+}
+    50% { opacity: 0.5; }
+    0%, 100% { opacity: 1; }
+@keyframes pulse {
+
+}
+    animation: pulse 2s infinite;
+.pulse-animation {
+
+}
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    -webkit-background-clip: text;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+.gradient-text {
+
+}
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+.gradient-bg {
+
+}
+    font-family: 'Playfair Display', serif;
+.hero-title {
+
+}
+    font-family: 'Poppins', sans-serif;
+body {
+
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@300;400;500;600;700&display=swap');
+

@@ -1,20 +1,21 @@
 package com.dawb.finaldawb.repository;
 
 import com.dawb.finaldawb.domain.RecetaPaso;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
-import jakarta.transaction.Transactional;
 import java.util.Optional;
 
-@Transactional
+@ApplicationScoped
 public class RecetaPasoRepository {
 
-    @PersistenceContext
+    @Inject
     private EntityManager em;
 
     public RecetaPaso save(RecetaPaso recetaPaso) {
         if (recetaPaso.getId() == null) {
             em.persist(recetaPaso);
+            em.flush(); // Forzar sincronización para obtener el ID generado
             return recetaPaso;
         } else {
             return em.merge(recetaPaso);

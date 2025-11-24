@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comunidad - Cocina Social</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="assets/css/common.css">
+    <link rel="stylesheet" href="assets/css/comunidad.css">
+</head>
+<body class="bg-gray-50">
+
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg fixed w-full top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <i class="fas fa-utensils text-3xl text-purple-600 mr-3"></i>
+                    <span class="text-2xl font-bold text-purple-600">Cocina Social</span>
+                </div>
+                <div class="hidden md:flex space-x-8">
+                    <a href="home.html" class="text-gray-700 hover:text-purple-600 transition">Inicio</a>
+                    <a href="recetas.html" class="text-gray-700 hover:text-purple-600 transition">Recetas</a>
+                    <a href="lugares.html" class="text-gray-700 hover:text-purple-600 transition">Lugares</a>
+                    <a href="comunidad.html" class="text-teal-600 font-semibold">Comunidad</a>
+                </div>
+                <div class="flex space-x-3" id="nav-buttons"></div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header -->
+    <div class="pt-24 pb-12 gradient-bg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h1 class="text-4xl md:text-5xl font-bold mb-4 text-gray-800">💬 Comunidad Activa</h1>
+            <p class="text-xl text-gray-700">Comparte opiniones y conecta con otros foodies</p>
+        </div>
+    </div>
+
+    <!-- Crear Comentario -->
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 mb-8">
+        <div class="bg-white rounded-lg shadow-lg p-6" id="crear-comentario-section">
+            <h3 class="text-xl font-bold text-gray-900 mb-4">
+                <i class="fas fa-comment-dots text-teal-600 mr-2"></i>
+                Nuevo Comentario
+            </h3>
+            <form id="comentario-form" class="space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-gray-700 mb-2 font-medium">Tipo de Contenido *</label>
+                        <select id="comentario-objeto-id" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-600">
+                            <option value="">Seleccionar...</option>
+                            <option value="1">Receta</option>
+                            <option value="2">Lugar</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 mb-2 font-medium">ID del Contenido *</label>
+                        <input type="number" id="comentario-referencia-id" required min="1"
+                               placeholder="Ej: 1"
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-600">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-gray-700 mb-2 font-medium">Tu Comentario *</label>
+                    <textarea id="comentario-contenido" required rows="4" placeholder="Comparte tu opinión..."
+                              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-600"></textarea>
+                </div>
+
+                <button type="submit"
+                        class="w-full py-3 bg-gradient-to-r from-teal-600 to-cyan-600 text-white rounded-lg font-semibold hover:from-teal-700 hover:to-cyan-700 transition">
+                    <i class="fas fa-paper-plane mr-2"></i> Publicar Comentario
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Lista de Comentarios -->
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
+        <div class="bg-white rounded-lg shadow-lg p-6">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-2xl font-bold text-gray-900">
+                    <i class="fas fa-comments text-teal-600 mr-2"></i>
+                    Comentarios Recientes
+                </h3>
+                <button onclick="loadComentarios()" class="px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition">
+                    <i class="fas fa-sync-alt mr-2"></i> Actualizar
+                </button>
+            </div>
+
+            <div id="comentarios-list" class="space-y-4">
+                <div class="text-center py-12">
+                    <i class="fas fa-spinner fa-spin text-4xl text-teal-600 mb-4"></i>
+                    <p class="text-gray-600">Cargando comentarios...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div id="footer"></div>
+
+    <!-- Modals -->
+    <div id="auth-modal"></div>
+    <div id="toast"></div>
+
+    <script src="assets/js/auth.js"></script>
+    <script src="assets/js/components.js"></script>
+    <script>
+        Components.loadFooter();
+        Components.loadAuthModal();
+        Components.loadToast();
+
+        function checkAuthForComment() {
+            const section = document.getElementById('crear-comentario-section');
+            if (!Auth.isLoggedIn()) {
+                section.innerHTML = `
+                    <div class="text-center py-8">
+                        <i class="fas fa-lock text-4xl text-gray-300 mb-4"></i>
+                        <p class="text-gray-600 text-lg mb-4">Debes iniciar sesión para comentar</p>
+                        <button onclick="Auth.showModal('login')" class="px-6 py-3 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition">
+                            Iniciar Sesión
+                        </button>
+                    </div>
+                `;
+            }
+        }
+
+        async function loadComentarios() {
+            const list = document.getElementById('comentarios-list');
+            list.innerHTML = '<div class="text-center py-12"><i class="fas fa-spinner fa-spin text-4xl text-teal-600"></i></div>';
+
+            try {
+                // Cargar comentarios de diferentes endpoints
+                const [comentariosRecetas, comentariosLugares] = await Promise.all([
+                    fetch(`${API_BASE_URL}/comentarios/receta/1`).then(r => r.ok ? r.json() : []).catch(() => []),
+                    fetch(`${API_BASE_URL}/comentarios/lugar/1`).then(r => r.ok ? r.json() : []).catch(() => [])
+                ]);
+
+                const todosComentarios = [...comentariosRecetas, ...comentariosLugares];
+
+                if (todosComentarios.length === 0) {
+                    list.innerHTML = `
+                        <div class="text-center py-12">
+                            <i class="fas fa-comment-slash text-6xl text-gray-300 mb-4"></i>
+                            <p class="text-gray-600 text-lg">No hay comentarios aún.</p>
+                            <p class="text-gray-500">¡Sé el primero en comentar!</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                const user = Auth.getUser();
+
+                list.innerHTML = todosComentarios.map(comentario => {
+                    const estadoBadge = {
+                        'APROBADO': '<span class="text-xs bg-green-100 text-green-600 px-2 py-1 rounded">✓ Aprobado</span>',
+                        'PENDIENTE': '<span class="text-xs bg-yellow-100 text-yellow-600 px-2 py-1 rounded">⏳ Pendiente</span>',
+                        'RECHAZADO': '<span class="text-xs bg-red-100 text-red-600 px-2 py-1 rounded">✗ Rechazado</span>'
+                    };
+
+                    return `
+                        <div class="comment-card border border-gray-200 rounded-lg p-4">
+                            <div class="flex items-start justify-between mb-2">
+                                <div class="flex items-center">
+                                    <div class="w-10 h-10 bg-teal-600 rounded-full flex items-center justify-center text-white font-bold mr-3">
+                                        ${comentario.autorUsername ? comentario.autorUsername[0].toUpperCase() : '?'}
+                                    </div>
+                                    <div>
+                                        <p class="font-semibold text-gray-900">${comentario.autorUsername || 'Anónimo'}</p>
+                                        <p class="text-xs text-gray-500">
+                                            <i class="far fa-clock mr-1"></i>
+                                            ${new Date(comentario.fechaCreacion).toLocaleDateString('es-ES')}
+                                        </p>
+                                    </div>
+                                </div>
+                                ${estadoBadge[comentario.estado] || ''}
+                            </div>
+                            <p class="text-gray-700 mb-2">${comentario.contenido}</p>
+                            <p class="text-xs text-gray-400">
+                                <i class="fas fa-tag mr-1"></i>
+                                ${comentario.objetoId === 1 ? 'Receta' : 'Lugar'} #${comentario.referenciaId}
+                            </p>
+                        </div>
+                    `;
+                }).join('');
+
+                Utils.showToast('Comentarios cargados', `${todosComentarios.length} comentario(s)`);
+            } catch (error) {
+                list.innerHTML = '<div class="text-center py-12"><p class="text-red-600">Error al cargar comentarios</p></div>';
+                Utils.showToast('Error', 'No se pudieron cargar los comentarios', 'error');
+            }
+        }
+
+        document.getElementById('comentario-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            if (!Auth.isLoggedIn()) {
+                Utils.showToast('Debes iniciar sesión', 'Inicia sesión para comentar', 'info');
+                Auth.showModal('login');
+                return;
+            }
+
+            const payload = {
+                objetoId: parseInt(document.getElementById('comentario-objeto-id').value),
+                referenciaId: parseInt(document.getElementById('comentario-referencia-id').value),
+                contenido: document.getElementById('comentario-contenido').value
+            };
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/comentarios`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    Utils.showToast('¡Comentario publicado!', 'Tu comentario está pendiente de moderación', 'success');
+                    document.getElementById('comentario-form').reset();
+                    loadComentarios();
+                } else {
+                    Utils.showToast('Error', data.error || data.message || 'Error al publicar', 'error');
+                }
+            } catch (error) {
+                Utils.showToast('Error', 'No se pudo publicar el comentario', 'error');
+            }
+        });
+
+        window.addEventListener('DOMContentLoaded', () => {
+            checkAuthForComment();
+            loadComentarios();
+        });
+    </script>
+</body>
+</html>
+

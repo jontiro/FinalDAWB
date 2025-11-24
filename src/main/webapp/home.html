@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inicio - Cocina Social</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="assets/css/common.css">
+    <link rel="stylesheet" href="assets/css/home.css">
+</head>
+<body class="bg-gray-50">
+
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg fixed w-full top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <i class="fas fa-utensils text-3xl gradient-text mr-3"></i>
+                    <span class="text-2xl font-bold gradient-text">Cocina Social</span>
+                </div>
+                <div class="hidden md:flex space-x-8">
+                    <a href="home.html" class="text-purple-600 font-semibold">Inicio</a>
+                    <a href="recetas.html" class="text-gray-700 hover:text-purple-600 transition">Recetas</a>
+                    <a href="lugares.html" class="text-gray-700 hover:text-purple-600 transition">Lugares</a>
+                    <a href="comunidad.html" class="text-gray-700 hover:text-purple-600 transition">Comunidad</a>
+                </div>
+                <div class="flex space-x-3" id="nav-buttons">
+                    <!-- Se llenará dinámicamente -->
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="pt-24 pb-20 gradient-bg text-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-2 gap-12 items-center">
+                <div class="space-y-6">
+                    <h1 class="hero-title text-5xl md:text-6xl font-bold leading-tight">
+                        Descubre, Comparte y Disfruta
+                        <span class="block mt-2">Recetas Increíbles</span>
+                    </h1>
+                    <p class="text-xl text-purple-100">
+                        Únete a nuestra comunidad de amantes de la cocina. Explora miles de recetas,
+                        descubre restaurantes increíbles y conecta con otros foodies.
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="recetas.html" class="px-8 py-4 bg-white text-purple-600 rounded-lg font-semibold hover:bg-gray-100 transition shadow-lg">
+                            Explorar Recetas
+                        </a>
+                        <button onclick="Auth.showModal('register')" class="px-8 py-4 bg-transparent border-2 border-white text-white rounded-lg font-semibold hover:bg-white hover:text-purple-600 transition">
+                            Comenzar Gratis
+                        </button>
+                    </div>
+                </div>
+                <div class="relative">
+                    <div class="bg-white rounded-3xl shadow-2xl p-8 transform rotate-3 hover:rotate-0 transition duration-500">
+                        <i class="fas fa-pizza-slice text-purple-600 text-9xl mx-auto block"></i>
+                    </div>
+                    <div class="absolute -top-4 -right-4 bg-yellow-400 rounded-full w-24 h-24 flex items-center justify-center pulse-animation">
+                        <span class="text-2xl">🍳</span>
+                    </div>
+                    <div class="absolute -bottom-4 -left-4 bg-red-400 rounded-full w-20 h-20 flex items-center justify-center pulse-animation" style="animation-delay: 0.5s;">
+                        <span class="text-2xl">🥘</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="py-12 gradient-bg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+                <div class="stat-card text-center p-6 rounded-xl text-white">
+                    <div class="text-4xl font-bold mb-2" id="stat-recetas">0</div>
+                    <div class="text-purple-200">Recetas Publicadas</div>
+                </div>
+                <div class="stat-card text-center p-6 rounded-xl text-white">
+                    <div class="text-4xl font-bold mb-2" id="stat-lugares">0</div>
+                    <div class="text-purple-200">Lugares Recomendados</div>
+                </div>
+                <div class="stat-card text-center p-6 rounded-xl text-white">
+                    <div class="text-4xl font-bold mb-2">500+</div>
+                    <div class="text-purple-200">Usuarios Activos</div>
+                </div>
+                <div class="stat-card text-center p-6 rounded-xl text-white">
+                    <div class="text-4xl font-bold mb-2" id="stat-comentarios">0</div>
+                    <div class="text-purple-200">Comentarios</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">¿Por qué Cocina Social?</h2>
+                <p class="text-xl text-gray-600">Todo lo que necesitas para convertirte en un chef experto</p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="bg-gradient-to-br from-purple-50 to-indigo-50 p-8 rounded-2xl border border-purple-100 hover:shadow-xl transition">
+                    <div class="bg-gradient-to-r from-purple-600 to-indigo-600 w-16 h-16 rounded-full flex items-center justify-center mb-6">
+                        <i class="fas fa-book-open text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-900 mb-3">Miles de Recetas</h3>
+                    <p class="text-gray-600">
+                        Accede a una biblioteca infinita de recetas para todos los gustos y niveles.
+                    </p>
+                </div>
+
+                <div class="bg-gradient-to-br from-pink-50 to-rose-50 p-8 rounded-2xl border border-pink-100 hover:shadow-xl transition">
+                    <div class="bg-gradient-to-r from-pink-600 to-rose-600 w-16 h-16 rounded-full flex items-center justify-center mb-6">
+                        <i class="fas fa-map-marker-alt text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-900 mb-3">Descubre Lugares</h3>
+                    <p class="text-gray-600">
+                        Encuentra los mejores restaurantes cerca de ti con recomendaciones de la comunidad.
+                    </p>
+                </div>
+
+                <div class="bg-gradient-to-br from-orange-50 to-yellow-50 p-8 rounded-2xl border border-orange-100 hover:shadow-xl transition">
+                    <div class="bg-gradient-to-r from-orange-600 to-yellow-600 w-16 h-16 rounded-full flex items-center justify-center mb-6">
+                        <i class="fas fa-users text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-900 mb-3">Comunidad Activa</h3>
+                    <p class="text-gray-600">
+                        Comparte, comenta y conecta con apasionados de la cocina.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-20 gradient-bg text-white">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 class="text-4xl md:text-5xl font-bold mb-6">
+                ¿Listo para Comenzar tu Aventura Culinaria?
+            </h2>
+            <p class="text-xl text-purple-100 mb-8">
+                Únete a miles de usuarios que ya están descubriendo nuevas recetas cada día
+            </p>
+            <button onclick="Auth.showModal('register')" class="px-10 py-4 bg-white text-purple-600 rounded-lg font-bold text-lg hover:bg-gray-100 transition shadow-2xl">
+                Crear Cuenta Gratuita
+            </button>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <div id="footer"></div>
+
+    <!-- Modals -->
+    <div id="auth-modal"></div>
+    <div id="toast"></div>
+
+    <script src="assets/js/auth.js"></script>
+    <script src="assets/js/components.js"></script>
+    <script>
+        // Load components
+        Components.loadNavigation();
+        Components.loadFooter();
+        Components.loadAuthModal();
+        Components.loadToast();
+
+        // Load statistics
+        async function loadStats() {
+            try {
+                const [recetas, lugares] = await Promise.all([
+                    fetch(`${API_BASE_URL}/recetas`).then(r => r.json()),
+                    fetch(`${API_BASE_URL}/lugares`).then(r => r.json())
+                ]);
+
+                Utils.animateCounter('stat-recetas', recetas.length);
+                Utils.animateCounter('stat-lugares', lugares.length);
+                Utils.animateCounter('stat-comentarios', Math.floor(Math.random() * 200) + 100);
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            loadStats();
+        });
+    </script>
+</body>
+</html>

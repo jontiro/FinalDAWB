@@ -3,17 +3,17 @@ package com.dawb.finaldawb.repository;
 import com.dawb.finaldawb.domain.Comentario;
 import com.dawb.finaldawb.domain.Objeto;
 import com.dawb.finaldawb.domain.Usuario;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
-import jakarta.transaction.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 
-@Transactional
+@ApplicationScoped
 public class ComentarioRepository {
 
-    @PersistenceContext
+    @Inject
     private EntityManager em;
 
     // --- Operaciones CRUD Básicas ---
@@ -21,6 +21,7 @@ public class ComentarioRepository {
     public Comentario save(Comentario comentario) {
         if (comentario.getId() == null) {
             em.persist(comentario);
+            em.flush(); // Forzar sincronización para obtener el ID generado
             return comentario;
         } else {
             return em.merge(comentario);

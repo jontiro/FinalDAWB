@@ -32,23 +32,45 @@ public class LugarResource {
      */
     @POST
     public Response createLugar(Lugar lugar) {
-        // SIMULACIÓN DE SEGURIDAD: Asignar un autor_id conocido.
-        Long autorId = 1L; // Asume que el usuario 1 está creando esto.
+        try {
+            // SIMULACIÓN DE SEGURIDAD: Asignar un autor_id conocido.
+            Long autorId = 1L; // Asume que el usuario 1 está creando esto.
 
-        // CORRECCIÓN 1: Usar createLugar y pasar el autorId
-        Lugar nuevoLugar = lugarService.createLugar(lugar, autorId)
-                .orElse(null);
+            // Validar que los campos requeridos no estén vacíos
+            if (lugar.getNombre() == null || lugar.getNombre().isBlank()) {
+                return Response.status(Response.Status.BAD_REQUEST)
+                        .entity("{\"error\": \"El campo 'nombre' es requerido\"}")
+                        .build();
+            }
 
-        if (nuevoLugar == null) {
-            return Response.status(Response.Status.BAD_REQUEST)
-                    .entity("Error al crear lugar: el autor no existe.")
+            if (lugar.getDireccion() == null || lugar.getDireccion().isBlank()) {
+                return Response.status(Response.Status.BAD_REQUEST)
+                        .entity("{\"error\": \"El campo 'direccion' es requerido\"}")
+                        .build();
+            }
+
+            // CORRECCIÓN 1: Usar createLugar y pasar el autorId
+            Lugar nuevoLugar = lugarService.createLugar(lugar, autorId)
+                    .orElse(null);
+
+            if (nuevoLugar == null) {
+                return Response.status(Response.Status.BAD_REQUEST)
+                        .entity("{\"error\": \"Error al crear lugar: el usuario con ID " + autorId + " no existe en la base de datos. Primero debes crear un usuario.\"}")
+                        .build();
+            }
+
+            // Retorna 201 Created con la ubicación del recurso
+            return Response.created(URI.create("/lugares/" + nuevoLugar.getId()))
+                    .entity(LugarResponse.fromEntity(nuevoLugar))
+                    .build();
+
+        } catch (Exception e) {
+            // Log del error para debugging
+            e.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("{\"error\": \"Error interno: " + e.getMessage() + "\"}")
                     .build();
         }
-
-        // Retorna 201 Created con la ubicación del recurso
-        return Response.created(URI.create("/lugares/" + nuevoLugar.getId()))
-                .entity(LugarResponse.fromEntity(nuevoLugar))
-                .build();
     }
 
     /**

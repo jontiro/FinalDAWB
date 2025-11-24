@@ -67,7 +67,14 @@
 
 <script>
     // CRÍTICO: La URL base debe coincidir con el Context Root del WAR
-    const API_BASE_URL = "/FinalDAWB-1.0-SNAPSHOT/api";
+    // Detectar automáticamente el context path actual
+    const currentPath = window.location.pathname;
+    const contextPath = currentPath.substring(0, currentPath.indexOf('/', 1)) || '';
+    const API_BASE_URL = `${contextPath}/api`;
+
+    console.log('Context Path detectado:', contextPath);
+    console.log('API Base URL:', API_BASE_URL);
+
     const statusMessage = document.getElementById('status-message');
     const apiOutput = document.getElementById('api-output');
     const recipeCount = document.getElementById('recipe-count');
@@ -93,6 +100,19 @@
         apiOutput.textContent = JSON.stringify(data, null, 2);
     }
 
+    // Función auxiliar mejorada para manejar respuestas JSON o HTML
+    async function handleResponse(response) {
+        const contentType = response.headers.get('content-type');
+
+        if (contentType && contentType.includes('application/json')) {
+            return await response.json();
+        } else {
+            // Si no es JSON, probablemente es HTML (página de error)
+            const text = await response.text();
+            throw new Error(`Respuesta no-JSON recibida (${response.status}). El servidor devolvió HTML. Verifica la URL y que la aplicación esté desplegada correctamente.`);
+        }
+    }
+
     // --- Manejador de Diagnóstico de Conexión ---
 
     document.getElementById('diagnostico-btn').addEventListener('click', async () => {
@@ -103,109 +123,26 @@
                 headers: { 'Accept': 'application/json' }
             });
 
-            const data = await response.json();
+            const data = await handleResponse(response);
             displayJson(data);
 
             if (response.ok) {
                 showStatus(`Diagnóstico OK: Conexión a BD exitosa. Roles encontrados: ${data.join(', ')}`, 'success');
             } else {
-                // El servidor HTTP 500 contendrá el JSON de error
                 const errorMessage = data.message || `Error ${response.status}: Revise los logs de Tomcat.`;
-
                 showStatus(`DIAGNÓSTICO FALLIDO: ${errorMessage}`, 'error');
 
-                // Si falla el parseo (otro 500, error en el servidor)
                 if (data.error === "PERSISTENCE_FAILURE") {
                     showStatus(`FALLO DE PERSISTENCIA: ${data.message}. Causa más probable: MariaDB apagada o credenciales incorrectas.`, 'error');
                 }
             }
         } catch (error) {
-            showStatus(`ERROR CRÍTICO: No se pudo conectar al endpoint de diagnóstico.`, 'error');
-            apiOutput.textContent = `Error de red o JSON inválido: ${error.message}. Verifique el log de Tomcat.`;
+            showStatus(`ERROR: ${error.message}`, 'error');
+            apiOutput.textContent = `Error: ${error.message}\n\nVerifica:\n1. Que Tomcat esté corriendo\n2. Que la aplicación esté desplegada\n3. La URL en la consola del navegador (F12)`;
         }
     });
 
 
-    // --- Manejadores de Eventos (Registro, Login, Recetas) ---
-
-    document.getElementById('register-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const username = document.getElementById('reg-username').value;
-        const email = document.getElementById('reg-email').value;
-        const password = document.getElementById('reg-password').value;
-
-        const payload = { username, email, password };
-
-        try {
-            const response = await fetch(`${API_BASE_URL}/auth/register`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-
-            const data = await response.json();
-            displayJson(data);
-
-            if (response.ok) {
-                showStatus(`Registro exitoso para ${username}! ID: ${data.id}`, 'success');
-            } else {
-                // Si es 400, data.entity contendrá el mensaje de error de validación
-                showStatus(`Fallo en el registro: ${data.entity || response.statusText}`, 'error');
-            }
-        } catch (error) {
-            showStatus(`Error de conexión o JSON inválido: ${error.message}. ¿El servidor está enviando un error HTML 500?`, 'error');
-        }
-    });
-
-    document.getElementById('login-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const usernameOrEmail = document.getElementById('log-useremail').value;
-        const password = document.getElementById('log-password').value;
-
-        const payload = { usernameOrEmail, password };
-
-        try {
-            const response = await fetch(`${API_BASE_URL}/auth/login`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-
-            const data = await response.json();
-            displayJson(data);
-
-            if (response.ok) {
-                showStatus(`Login exitoso para ${data.username}! Rol: ${data.role}`, 'success');
-            } else {
-                showStatus(`Fallo de autenticación: ${data.entity || response.statusText}`, 'error');
-            }
-        } catch (error) {
-            showStatus(`Error de conexión o JSON inválido: ${error.message}`, 'error');
-        }
-    });
-
-    document.getElementById('fetch-recipes-btn').addEventListener('click', async () => {
-        try {
-            const response = await fetch(`${API_BASE_URL}/recetas`, {
-                method: 'GET',
-                headers: { 'Accept': 'application/json' }
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            const data = await response.json();
-            displayJson(data);
-
-            showStatus(`Carga de recetas exitosa. ${data.length} resultados.`, 'success');
-            recipeCount.textContent = `Total de recetas públicas encontradas: ${data.length}`;
-        } catch (error) {
-            showStatus(`Error al cargar recetas: ${error.message}. Verifica la conexión.`, 'error');
-            recipeCount.textContent = 'No se pudieron cargar las recetas.';
-            apiOutput.textContent = 'Error: No se pudo conectar con el recurso /api/recetas.';
-        }
-    });
 
 </script>
 </body>

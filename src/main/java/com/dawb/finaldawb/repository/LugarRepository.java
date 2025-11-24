@@ -2,17 +2,17 @@ package com.dawb.finaldawb.repository;
 
 import com.dawb.finaldawb.domain.Lugar;
 import com.dawb.finaldawb.domain.Usuario;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
-import jakarta.transaction.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 
-@Transactional
+@ApplicationScoped
 public class LugarRepository {
 
-    @PersistenceContext
+    @Inject
     private EntityManager em;
 
     // --- Operaciones CRUD Básicas ---
@@ -20,6 +20,7 @@ public class LugarRepository {
     public Lugar save(Lugar lugar) {
         if (lugar.getId() == null) {
             em.persist(lugar); // INSERT
+            em.flush(); // Forzar sincronización con BD para obtener el ID generado
             return lugar;
         } else {
             return em.merge(lugar); // UPDATE

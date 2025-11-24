@@ -7,14 +7,12 @@ import com.dawb.finaldawb.repository.RoleRepository;
 import com.dawb.finaldawb.repository.UsuarioRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import jakarta.transaction.Transactional;
-import org.mindrot.jbcrypt.BCrypt; // <-- NUEVO IMPORT para la funcionalidad real de hasheo
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.time.Instant;
 import java.util.Optional;
 
 @ApplicationScoped
-@Transactional
 public class AuthService {
 
     @Inject

@@ -1,23 +1,24 @@
 package com.dawb.finaldawb.repository;
 
 import com.dawb.finaldawb.domain.Objeto;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
-import jakarta.persistence.PersistenceContext;
-import jakarta.transaction.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 
-@Transactional
+@ApplicationScoped
 public class ObjetoRepository {
 
-    @PersistenceContext
+    @Inject
     private EntityManager em;
 
     public Objeto save(Objeto objeto) {
         if (objeto.getId() == null) {
             em.persist(objeto);
+            em.flush(); // Forzar sincronización para obtener el ID generado
             return objeto;
         } else {
             return em.merge(objeto);

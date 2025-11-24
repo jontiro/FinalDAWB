@@ -1,0 +1,19 @@
+/* admin.css - Estilos para el panel de administración */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+body {
+    font-family: 'Poppins', sans-serif;
+}
+
+.gradient-bg {
+    background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+}
+
+.stat-card {
+    transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+}
+

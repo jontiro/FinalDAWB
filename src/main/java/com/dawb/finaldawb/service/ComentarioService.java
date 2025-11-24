@@ -16,9 +16,13 @@ import java.util.Optional;
 @Transactional
 public class ComentarioService {
 
-    private final ComentarioRepository comentarioRepository;
-    private final ObjetoService objetoService;
-    private final UsuarioRepository usuarioRepository;
+    private ComentarioRepository comentarioRepository;
+    private ObjetoService objetoService;
+    private UsuarioRepository usuarioRepository;
+
+    // Constructor vacío requerido por CDI
+    protected ComentarioService() {
+    }
 
     // Inyección por constructor
     @Inject

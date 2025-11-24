@@ -3,17 +3,17 @@ package com.dawb.finaldawb.repository;
 import com.dawb.finaldawb.domain.Recomendacion;
 import com.dawb.finaldawb.domain.Tipo;
 import com.dawb.finaldawb.domain.Usuario;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
-import jakarta.transaction.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 
-@Transactional
+@ApplicationScoped
 public class RecomendacionRepository {
 
-    @PersistenceContext
+    @Inject
     private EntityManager em;
 
     // --- Operaciones CRUD Básicas ---
@@ -21,6 +21,7 @@ public class RecomendacionRepository {
     public Recomendacion save(Recomendacion recomendacion) {
         if (recomendacion.getId() == null) {
             em.persist(recomendacion);
+            em.flush(); // Forzar sincronización para obtener el ID generado
             return recomendacion;
         } else {
             return em.merge(recomendacion);

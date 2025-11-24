@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cocina Social - Comparte tus recetas favoritas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@300;400;500;600;700&display=swap');
+
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .hero-title {
+            font-family: 'Playfair Display', serif;
+        }
+
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+
+        .card-hover:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+
+        .stat-card {
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .recipe-card {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .recipe-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .recipe-card:hover::before {
+            left: 100%;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg fixed w-full top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <i class="fas fa-utensils text-3xl gradient-text mr-3"></i>
+                    <span class="text-2xl font-bold gradient-text">Cocina Social</span>
+                </div>
+                <div class="hidden md:flex space-x-8">
+                    <a href="#inicio" class="text-gray-700 hover:text-purple-600 transition">Inicio</a>
+                    <a href="#recetas" class="text-gray-700 hover:text-purple-600 transition">Recetas</a>
+                    <a href="#lugares" class="text-gray-700 hover:text-purple-600 transition">Lugares</a>
+                    <a href="#comunidad" class="text-gray-700 hover:text-purple-600 transition">Comunidad</a>
+                    <a href="#contacto" class="text-gray-700 hover:text-purple-600 transition">Contacto</a>
+                </div>
+                <div class="flex space-x-3">
+                    <button onclick="showAuthModal('login')" class="px-4 py-2 text-purple-600 border border-purple-600 rounded-lg hover:bg-purple-50 transition">
+                        Iniciar Sesión
+                    </button>
+                    <button onclick="showAuthModal('register')" class="px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg hover:from-purple-700 hover:to-indigo-700 transition">
+                        Registrarse
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="inicio" class="pt-24 pb-20 gradient-bg text-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-2 gap-12 items-center">
+                <div class="space-y-6">
+                    <h1 class="hero-title text-5xl md:text-6xl font-bold leading-tight">
+                        Descubre, Comparte y Disfruta
+                        <span class="block mt-2">Recetas Increíbles</span>
+                    </h1>
+                    <p class="text-xl text-purple-100">
+                        Únete a nuestra comunidad de amantes de la cocina. Explora miles de recetas,
+                        descubre restaurantes increíbles y conecta con otros foodies.
+                    </p>
+                    <div class="flex space-x-4">
+                        <button onclick="scrollToSection('recetas')" class="px-8 py-4 bg-white text-purple-600 rounded-lg font-semibold hover:bg-gray-100 transition shadow-lg">
+                            Explorar Recetas
+                        </button>
+                        <button onclick="showAuthModal('register')" class="px-8 py-4 bg-transparent border-2 border-white text-white rounded-lg font-semibold hover:bg-white hover:text-purple-600 transition">
+                            Comenzar Gratis
+                        </button>
+                    </div>
+                </div>
+                <div class="relative">
+                    <div class="bg-white rounded-3xl shadow-2xl p-8 transform rotate-3 hover:rotate-0 transition duration-500">
+                        <i class="fas fa-pizza-slice text-purple-600 text-9xl mx-auto block"></i>
+                    </div>
+                    <div class="absolute -top-4 -right-4 bg-yellow-400 rounded-full w-24 h-24 flex items-center justify-center pulse-animation">
+                        <span class="text-2xl">🍳</span>
+                    </div>
+                    <div class="absolute -bottom-4 -left-4 bg-red-400 rounded-full w-20 h-20 flex items-center justify-center pulse-animation" style="animation-delay: 0.5s;">
+                        <span class="text-2xl">🥘</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="py-12 gradient-bg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+                <div class="stat-card text-center p-6 rounded-xl text-white">
+                    <div class="text-4xl font-bold mb-2" id="stat-recetas">0</div>
+                    <div class="text-purple-200">Recetas Publicadas</div>
+                </div>
+                <div class="stat-card text-center p-6 rounded-xl text-white">
+                    <div class="text-4xl font-bold mb-2" id="stat-lugares">0</div>
+                    <div class="text-purple-200">Lugares Recomendados</div>
+                </div>
+                <div class="stat-card text-center p-6 rounded-xl text-white">
+                    <div class="text-4xl font-bold mb-2" id="stat-usuarios">500+</div>
+                    <div class="text-purple-200">Usuarios Activos</div>
+                </div>
+                <div class="stat-card text-center p-6 rounded-xl text-white">
+                    <div class="text-4xl font-bold mb-2" id="stat-comentarios">0</div>
+                    <div class="text-purple-200">Comentarios</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">¿Por qué Cocina Social?</h2>
+                <p class="text-xl text-gray-600">Todo lo que necesitas para convertirte en un chef experto</p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="card-hover bg-gradient-to-br from-purple-50 to-indigo-50 p-8 rounded-2xl border border-purple-100">
+                    <div class="bg-gradient-to-r from-purple-600 to-indigo-600 w-16 h-16 rounded-full flex items-center justify-center mb-6">
+                        <i class="fas fa-book-open text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-900 mb-3">Miles de Recetas</h3>
+                    <p class="text-gray-600">
+                        Accede a una biblioteca infinita de recetas para todos los gustos y niveles.
+                        Desde platos sencillos hasta alta cocina.
+                    </p>
+                </div>
+
+                <div class="card-hover bg-gradient-to-br from-pink-50 to-rose-50 p-8 rounded-2xl border border-pink-100">
+                    <div class="bg-gradient-to-r from-pink-600 to-rose-600 w-16 h-16 rounded-full flex items-center justify-center mb-6">
+                        <i class="fas fa-map-marker-alt text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-900 mb-3">Descubre Lugares</h3>
+                    <p class="text-gray-600">
+                        Encuentra los mejores restaurantes y lugares para comer cerca de ti.
+                        Recomendaciones de la comunidad.
+                    </p>
+                </div>
+
+                <div class="card-hover bg-gradient-to-br from-orange-50 to-yellow-50 p-8 rounded-2xl border border-orange-100">
+                    <div class="bg-gradient-to-r from-orange-600 to-yellow-600 w-16 h-16 rounded-full flex items-center justify-center mb-6">
+                        <i class="fas fa-users text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-900 mb-3">Comunidad Activa</h3>
+                    <p class="text-gray-600">
+                        Comparte tus creaciones, comenta, califica y conecta con otros
+                        apasionados de la cocina.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Recetas Section -->
+    <section id="recetas" class="py-20 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center mb-12">
+                <div>
+                    <h2 class="text-4xl font-bold text-gray-900 mb-2">Recetas Destacadas</h2>
+                    <p class="text-gray-600">Las favoritas de nuestra comunidad</p>
+                </div>
+                <button onclick="loadRecetas()" class="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition">
+                    Ver Todas
+                </button>
+            </div>
+
+            <div id="recetas-grid" class="grid md:grid-cols-3 gap-8">
+                <!-- Loading placeholder -->
+                <div class="col-span-3 text-center py-12">
+                    <i class="fas fa-spinner fa-spin text-4xl text-purple-600 mb-4"></i>
+                    <p class="text-gray-600">Cargando recetas deliciosas...</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Lugares Section -->
+    <section id="lugares" class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center mb-12">
+                <div>
+                    <h2 class="text-4xl font-bold text-gray-900 mb-2">Lugares Recomendados</h2>
+                    <p class="text-gray-600">Los mejores restaurantes según nuestra comunidad</p>
+                </div>
+                <button onclick="loadLugares()" class="px-6 py-3 bg-pink-600 text-white rounded-lg hover:bg-pink-700 transition">
+                    Explorar Más
+                </button>
+            </div>
+
+            <div id="lugares-grid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Loading placeholder -->
+                <div class="col-span-3 text-center py-12">
+                    <i class="fas fa-spinner fa-spin text-4xl text-pink-600 mb-4"></i>
+                    <p class="text-gray-600">Descubriendo lugares increíbles...</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Comunidad Section -->
+    <section id="comunidad" class="py-20 bg-gradient-to-br from-purple-50 to-indigo-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">Únete a Nuestra Comunidad</h2>
+                <p class="text-xl text-gray-600">Miles de chefs caseros comparten sus experiencias</p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="bg-white p-8 rounded-2xl shadow-lg">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 bg-purple-600 rounded-full flex items-center justify-center text-white font-bold mr-4">
+                            MC
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-gray-900">María Castro</h4>
+                            <div class="text-yellow-500">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 italic">
+                        "Increíble plataforma! He descubierto recetas que ahora son favoritas en mi familia.
+                        La comunidad es muy activa y siempre hay tips útiles."
+                    </p>
+                </div>
+
+                <div class="bg-white p-8 rounded-2xl shadow-lg">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 bg-pink-600 rounded-full flex items-center justify-center text-white font-bold mr-4">
+                            JR
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-gray-900">Juan Rodríguez</h4>
+                            <div class="text-yellow-500">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 italic">
+                        "Como chef profesional, me encanta ver la pasión de la comunidad.
+                        Las recomendaciones de lugares son de primera calidad."
+                    </p>
+                </div>
+
+                <div class="bg-white p-8 rounded-2xl shadow-lg">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 bg-orange-600 rounded-full flex items-center justify-center text-white font-bold mr-4">
+                            AL
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-gray-900">Ana López</h4>
+                            <div class="text-yellow-500">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 italic">
+                        "Perfecto para principiantes como yo. Las instrucciones son claras
+                        y los resultados siempre sorprenden a mis invitados."
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-20 gradient-bg text-white">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 class="text-4xl md:text-5xl font-bold mb-6">
+                ¿Listo para Comenzar tu Aventura Culinaria?
+            </h2>
+            <p class="text-xl text-purple-100 mb-8">
+                Únete a miles de usuarios que ya están descubriendo nuevas recetas cada día
+            </p>
+            <button onclick="showAuthModal('register')" class="px-10 py-4 bg-white text-purple-600 rounded-lg font-bold text-lg hover:bg-gray-100 transition shadow-2xl">
+                Crear Cuenta Gratuita
+            </button>
+            <p class="mt-4 text-purple-200 text-sm">
+                Sin tarjeta de crédito. Acceso inmediato. ✨
+            </p>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-4 gap-8 mb-8">
+                <div>
+                    <div class="flex items-center mb-4">
+                        <i class="fas fa-utensils text-3xl gradient-text mr-3"></i>
+                        <span class="text-2xl font-bold">Cocina Social</span>
+                    </div>
+                    <p class="text-gray-400">
+                        La plataforma definitiva para amantes de la cocina.
+                    </p>
+                </div>
+                <div>
+                    <h4 class="font-bold text-lg mb-4">Explora</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#recetas" class="hover:text-white transition">Recetas</a></li>
+                        <li><a href="#lugares" class="hover:text-white transition">Lugares</a></li>
+                        <li><a href="#comunidad" class="hover:text-white transition">Comunidad</a></li>
+                        <li><a href="index.html" class="hover:text-white transition">Panel de Pruebas</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold text-lg mb-4">Soporte</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#" class="hover:text-white transition">Centro de Ayuda</a></li>
+                        <li><a href="#" class="hover:text-white transition">Términos de Uso</a></li>
+                        <li><a href="#" class="hover:text-white transition">Privacidad</a></li>
+                        <li><a href="#" class="hover:text-white transition">API Docs</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold text-lg mb-4">Síguenos</h4>
+                    <div class="flex space-x-4">
+                        <a href="#" class="w-10 h-10 bg-purple-600 rounded-full flex items-center justify-center hover:bg-purple-700 transition">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 bg-purple-600 rounded-full flex items-center justify-center hover:bg-purple-700 transition">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 bg-purple-600 rounded-full flex items-center justify-center hover:bg-purple-700 transition">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 bg-purple-600 rounded-full flex items-center justify-center hover:bg-purple-700 transition">
+                            <i class="fab fa-youtube"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 pt-8 text-center text-gray-400">
+                <p>&copy; 2025 Cocina Social. Todos los derechos reservados. Proyecto FinalDAWB</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Auth Modal -->
+    <div id="auth-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-8 relative">
+            <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+                <i class="fas fa-times text-2xl"></i>
+            </button>
+
+            <div id="login-form-container">
+                <h3 class="text-3xl font-bold text-gray-900 mb-6">Iniciar Sesión</h3>
+                <form id="login-form" class="space-y-4">
+                    <div>
+                        <label class="block text-gray-700 mb-2 font-medium">Usuario o Email</label>
+                        <input type="text" id="login-username" required
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent">
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 mb-2 font-medium">Contraseña</label>
+                        <input type="password" id="login-password" required
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent">
+                    </div>
+                    <button type="submit"
+                            class="w-full py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg font-semibold hover:from-purple-700 hover:to-indigo-700 transition">
+                        Iniciar Sesión
+                    </button>
+                </form>
+                <p class="mt-4 text-center text-gray-600">
+                    ¿No tienes cuenta?
+                    <button onclick="showAuthModal('register')" class="text-purple-600 font-semibold hover:underline">
+                        Regístrate
+                    </button>
+                </p>
+            </div>
+
+            <div id="register-form-container" class="hidden">
+                <h3 class="text-3xl font-bold text-gray-900 mb-6">Crear Cuenta</h3>
+                <form id="register-form" class="space-y-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-gray-700 mb-2 font-medium">Nombre</label>
+                            <input type="text" id="register-nombre"
+                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 mb-2 font-medium">Apellido</label>
+                            <input type="text" id="register-apellido"
+                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 mb-2 font-medium">Usuario</label>
+                        <input type="text" id="register-username" required
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent">
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 mb-2 font-medium">Email</label>
+                        <input type="email" id="register-email" required
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent">
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 mb-2 font-medium">Contraseña</label>
+                        <input type="password" id="register-password" required
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent">
+                    </div>
+                    <button type="submit"
+                            class="w-full py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg font-semibold hover:from-purple-700 hover:to-indigo-700 transition">
+                        Crear Cuenta
+                    </button>
+                </form>
+                <p class="mt-4 text-center text-gray-600">
+                    ¿Ya tienes cuenta?
+                    <button onclick="showAuthModal('login')" class="text-purple-600 font-semibold hover:underline">
+                        Inicia sesión
+                    </button>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="hidden fixed bottom-4 right-4 bg-white shadow-2xl rounded-lg p-4 max-w-sm z-50">
+        <div class="flex items-center">
+            <div id="toast-icon" class="mr-3"></div>
+            <div>
+                <p id="toast-message" class="font-semibold text-gray-900"></p>
+                <p id="toast-detail" class="text-sm text-gray-600"></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // API Configuration
+        const currentPath = window.location.pathname;
+        const contextPath = currentPath.substring(0, currentPath.indexOf('/', 1)) || '';
+        const API_BASE_URL = `${contextPath}/api`;
+
+        console.log('API Base URL:', API_BASE_URL);
+
+        // Toast Notification
+        function showToast(message, detail = '', type = 'success') {
+            const toast = document.getElementById('toast');
+            const icon = document.getElementById('toast-icon');
+            const messageEl = document.getElementById('toast-message');
+            const detailEl = document.getElementById('toast-detail');
+
+            const icons = {
+                success: '<i class="fas fa-check-circle text-green-500 text-2xl"></i>',
+                error: '<i class="fas fa-exclamation-circle text-red-500 text-2xl"></i>',
+                info: '<i class="fas fa-info-circle text-blue-500 text-2xl"></i>'
+            };
+
+            icon.innerHTML = icons[type] || icons.info;
+            messageEl.textContent = message;
+            detailEl.textContent = detail;
+
+            toast.classList.remove('hidden');
+            setTimeout(() => toast.classList.add('hidden'), 5000);
+        }
+
+        // Modal Functions
+        function showAuthModal(type) {
+            document.getElementById('auth-modal').classList.remove('hidden');
+            if (type === 'login') {
+                document.getElementById('login-form-container').classList.remove('hidden');
+                document.getElementById('register-form-container').classList.add('hidden');
+            } else {
+                document.getElementById('login-form-container').classList.add('hidden');
+                document.getElementById('register-form-container').classList.remove('hidden');
+            }
+        }
+
+        function closeAuthModal() {
+            document.getElementById('auth-modal').classList.add('hidden');
+        }
+
+        // Scroll Function
+        function scrollToSection(sectionId) {
+            document.getElementById(sectionId).scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Load Statistics
+        async function loadStats() {
+            try {
+                const [recetas, lugares] = await Promise.all([
+                    fetch(`${API_BASE_URL}/recetas`).then(r => r.json()),
+                    fetch(`${API_BASE_URL}/lugares`).then(r => r.json())
+                ]);
+
+                animateCounter('stat-recetas', recetas.length);
+                animateCounter('stat-lugares', lugares.length);
+                animateCounter('stat-comentarios', Math.floor(Math.random() * 200) + 100);
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+
+        function animateCounter(id, target) {
+            const element = document.getElementById(id);
+            let current = 0;
+            const increment = target / 50;
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= target) {
+                    element.textContent = target;
+                    clearInterval(timer);
+                } else {
+                    element.textContent = Math.floor(current);
+                }
+            }, 30);
+        }
+
+        // Load Recetas
+        async function loadRecetas() {
+            const grid = document.getElementById('recetas-grid');
+            grid.innerHTML = '<div class="col-span-3 text-center py-12"><i class="fas fa-spinner fa-spin text-4xl text-purple-600"></i></div>';
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/recetas`);
+                const recetas = await response.json();
+
+                if (recetas.length === 0) {
+                    grid.innerHTML = '<div class="col-span-3 text-center py-12"><p class="text-gray-600">No hay recetas disponibles aún. ¡Sé el primero en publicar!</p></div>';
+                    return;
+                }
+
+                grid.innerHTML = recetas.slice(0, 6).map(receta => `
+                    <div class="recipe-card bg-white rounded-2xl shadow-lg overflow-hidden card-hover">
+                        <div class="h-48 bg-gradient-to-br from-orange-400 to-pink-500 flex items-center justify-center">
+                            <i class="fas fa-utensils text-white text-6xl"></i>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold text-gray-900 mb-2">${receta.titulo}</h3>
+                            <p class="text-gray-600 mb-4 line-clamp-2">${receta.descripcion || 'Deliciosa receta'}</p>
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-gray-500">
+                                    <i class="far fa-clock mr-1"></i> ${receta.tiempoPreparacion} min
+                                </span>
+                                <span class="text-sm font-semibold text-purple-600">
+                                    ${receta.privacidad ? '🔒 Privada' : '🌐 Pública'}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+
+                showToast('Recetas cargadas', `${recetas.length} recetas encontradas`);
+            } catch (error) {
+                grid.innerHTML = '<div class="col-span-3 text-center py-12"><p class="text-red-600">Error al cargar recetas</p></div>';
+                showToast('Error', 'No se pudieron cargar las recetas', 'error');
+            }
+        }
+
+        // Load Lugares
+        async function loadLugares() {
+            const grid = document.getElementById('lugares-grid');
+            grid.innerHTML = '<div class="col-span-3 text-center py-12"><i class="fas fa-spinner fa-spin text-4xl text-pink-600"></i></div>';
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/lugares`);
+                const lugares = await response.json();
+
+                if (lugares.length === 0) {
+                    grid.innerHTML = '<div class="col-span-3 text-center py-12"><p class="text-gray-600">No hay lugares registrados aún. ¡Recomienda tu favorito!</p></div>';
+                    return;
+                }
+
+                grid.innerHTML = lugares.slice(0, 6).map(lugar => `
+                    <div class="bg-white rounded-2xl shadow-lg overflow-hidden card-hover">
+                        <div class="h-40 bg-gradient-to-br from-pink-400 to-purple-500 flex items-center justify-center">
+                            <i class="fas fa-map-marker-alt text-white text-5xl"></i>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold text-gray-900 mb-2">${lugar.nombre}</h3>
+                            <p class="text-gray-600 mb-2">
+                                <i class="fas fa-map-pin text-pink-600 mr-2"></i>${lugar.direccion}
+                            </p>
+                            ${lugar.ciudad ? `<p class="text-sm text-gray-500">${lugar.ciudad}${lugar.pais ? ', ' + lugar.pais : ''}</p>` : ''}
+                        </div>
+                    </div>
+                `).join('');
+
+                showToast('Lugares cargados', `${lugares.length} lugares encontrados`);
+            } catch (error) {
+                grid.innerHTML = '<div class="col-span-3 text-center py-12"><p class="text-red-600">Error al cargar lugares</p></div>';
+                showToast('Error', 'No se pudieron cargar los lugares', 'error');
+            }
+        }
+
+        // Auth Handlers
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('login-username').value;
+            const password = document.getElementById('login-password').value;
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ usernameOrEmail: username, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showToast('¡Bienvenido!', `Sesión iniciada como ${data.username}`, 'success');
+                    closeAuthModal();
+                    // Aquí podrías guardar el token y actualizar la UI
+                } else {
+                    showToast('Error de autenticación', data.message || 'Credenciales incorrectas', 'error');
+                }
+            } catch (error) {
+                showToast('Error', 'No se pudo conectar con el servidor', 'error');
+            }
+        });
+
+        document.getElementById('register-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const payload = {
+                username: document.getElementById('register-username').value,
+                email: document.getElementById('register-email').value,
+                password: document.getElementById('register-password').value,
+                nombre: document.getElementById('register-nombre').value || undefined,
+                apellido: document.getElementById('register-apellido').value || undefined
+            };
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/auth/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showToast('¡Cuenta creada!', `Bienvenido ${data.username}`, 'success');
+                    closeAuthModal();
+                    showAuthModal('login');
+                } else {
+                    showToast('Error al registrarse', data.message || 'Verifica los datos', 'error');
+                }
+            } catch (error) {
+                showToast('Error', 'No se pudo conectar con el servidor', 'error');
+            }
+        });
+
+        // Initialize on load
+        window.addEventListener('DOMContentLoaded', () => {
+            loadStats();
+            loadRecetas();
+            loadLugares();
+        });
+    </script>
+</body>
+</html>
+

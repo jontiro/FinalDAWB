@@ -1,0 +1,20 @@
+/* lugares.css - Estilos para la página de lugares */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+body {
+    font-family: 'Poppins', sans-serif;
+}
+
+.gradient-bg {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+.lugar-card {
+    transition: all 0.3s ease;
+}
+
+.lugar-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+

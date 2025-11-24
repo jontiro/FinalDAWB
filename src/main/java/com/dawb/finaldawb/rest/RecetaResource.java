@@ -2,6 +2,7 @@ package com.dawb.finaldawb.rest;
 
 import com.dawb.finaldawb.domain.Receta;
 import com.dawb.finaldawb.domain.RecetaPaso;
+import com.dawb.finaldawb.domain.Usuario;
 import com.dawb.finaldawb.rest.dto.RecetaRequest;
 import com.dawb.finaldawb.rest.dto.RecetaResponse;
 import com.dawb.finaldawb.rest.dto.PasoRequest;
@@ -41,27 +42,31 @@ public class RecetaResource {
      */
     @POST
     public Response createReceta(@Valid RecetaRequest request) {
-        // 1. Mapear DTO a Entidad principal Receta
-        Receta nuevaReceta = mapRequestToEntity(request);
+        // 1. Obtener el usuario creador desde la base de datos
+        Usuario creador = usuarioService.findById(request.getCreadorId()).orElse(null);
+        if (creador == null) {
+            return Response.status(Response.Status.NOT_FOUND)
+                    .entity("El usuario creador no existe")
+                    .build();
+        }
 
-        // 2. Mapear DTOs de Pasos a Entidades RecetaPaso
+        // 2. Mapear DTO a Entidad principal Receta
+        Receta nuevaReceta = mapRequestToEntity(request);
+        nuevaReceta.setCreador(creador); // Asignar el creador
+
+        // 3. Mapear DTOs de Pasos a Entidades RecetaPaso
         List<RecetaPaso> pasosEntities = request.getPasos().stream()
                 .map(RecetaResource::mapPasoRequestToEntity)
                 .collect(Collectors.toList());
 
-        // 3. Llamar al servicio para crear y persistir la receta
+        // 4. Llamar al servicio para crear y persistir la receta
         Receta savedReceta = recetaService.createReceta(
                 nuevaReceta,
                 pasosEntities,
                 request.getTags()
         );
 
-        // NOTA: No verificamos Optional.empty() aquí porque el creadorId se usa
-        // en el DTO, pero el servicio lo validará internamente al enlazar el objeto Usuario.
-        // Si el creadorId es inválido, el servicio lanzaría una excepción de FK,
-        // o requeriría una lógica de validación previa más compleja aquí.
-
-        // 4. Éxito: Devolver 201 CREATED con el DTO de respuesta seguro
+        // 5. Éxito: Devolver 201 CREATED con el DTO de respuesta seguro
         return Response.status(Response.Status.CREATED)
                 .entity(RecetaResponse.fromEntity(savedReceta))
                 .build();

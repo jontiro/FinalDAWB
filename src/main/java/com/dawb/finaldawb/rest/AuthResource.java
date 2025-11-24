@@ -21,7 +21,7 @@ public class AuthResource {
     private final AuthService authService;
 
     @Inject
-    public AuthResource(AuthService authService) {
+    public AuthResource(AuthService authService){
         this.authService = authService;
     }
 
@@ -43,7 +43,7 @@ public class AuthResource {
         if (nuevoUsuario == null) {
             // 2. Si el servicio devuelve Optional.empty(), el usuario/email ya existe
             return Response.status(Response.Status.BAD_REQUEST)
-                    .entity("El nombre de usuario o correo electrónico ya está registrado.")
+                    .entity(new ErrorResponse("El nombre de usuario o correo electrónico ya está registrado."))
                     .build();
         }
 
@@ -70,7 +70,7 @@ public class AuthResource {
         if (usuario == null) {
             // 2. Fallo de autenticación o usuario bloqueado
             return Response.status(Response.Status.UNAUTHORIZED)
-                    .entity("Credenciales inválidas o usuario inactivo.")
+                    .entity(new ErrorResponse("Credenciales inválidas o usuario inactivo."))
                     .build();
         }
 
@@ -107,6 +107,15 @@ public class AuthResource {
             this.username = username;
             this.email = email;
             this.role = role;
+        }
+    }
+
+    // DTO para respuestas de error
+    public static class ErrorResponse {
+        public String message;
+
+        public ErrorResponse(String message) {
+            this.message = message;
         }
     }
 }

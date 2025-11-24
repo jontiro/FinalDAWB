@@ -13,7 +13,11 @@ import java.util.Optional;
 @Transactional
 public class ObjetoService {
 
-    private final ObjetoRepository objetoRepository;
+    private ObjetoRepository objetoRepository;
+
+    // Constructor vacío requerido por CDI
+    protected ObjetoService() {
+    }
 
     // Inyección por constructor
     @Inject

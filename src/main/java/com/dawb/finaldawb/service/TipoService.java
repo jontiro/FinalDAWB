@@ -13,7 +13,11 @@ import java.util.Optional;
 @Transactional
 public class TipoService {
 
-    private final TipoRepository tipoRepository;
+    private TipoRepository tipoRepository;
+
+    // Constructor vacío requerido por CDI para crear proxies
+    protected TipoService() {
+    }
 
     // Inyección por constructor
     @Inject

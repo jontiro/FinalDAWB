@@ -1,18 +1,18 @@
 package com.dawb.finaldawb.rest;
 
-import com.dawb.finaldawb.domain.Comentario;
-import com.dawb.finaldawb.domain.Tipo;
-import com.dawb.finaldawb.domain.Objeto;
+import com.dawb.finaldawb.domain.*;
 import com.dawb.finaldawb.rest.dto.ComentarioResponse;
 import com.dawb.finaldawb.service.ComentarioService;
 import com.dawb.finaldawb.service.TipoService;
 import com.dawb.finaldawb.service.ObjetoService;
 import com.dawb.finaldawb.service.UsuarioService;
+import com.dawb.finaldawb.repository.RoleRepository;
 
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -28,13 +28,17 @@ public class AdminResource {
     private final TipoService tipoService;
     private final ObjetoService objetoService;
     private final UsuarioService usuarioService;
+    private final RoleRepository roleRepository;
 
     @Inject
-    public AdminResource(ComentarioService comentarioService, TipoService tipoService, ObjetoService objetoService, UsuarioService usuarioService) {
+    public AdminResource(ComentarioService comentarioService, TipoService tipoService,
+                        ObjetoService objetoService, UsuarioService usuarioService,
+                        RoleRepository roleRepository) {
         this.comentarioService = comentarioService;
         this.tipoService = tipoService;
         this.objetoService = objetoService;
         this.usuarioService = usuarioService;
+        this.roleRepository = roleRepository;
     }
 
     // --- 1. MODERACIÓN DE COMENTARIOS ---
@@ -137,6 +141,57 @@ public class AdminResource {
             return Response.noContent().build();
         } else {
             return Response.status(Response.Status.NOT_FOUND).build();
+        }
+    }
+
+    // --- 4. INICIALIZACIÓN DE DATOS DE PRUEBA ---
+
+    /**
+     * POST /admin/init-data : Inicializa datos de prueba en la base de datos.
+     * Este endpoint es útil para desarrollo y testing.
+     * ADVERTENCIA: Solo usar en desarrollo, no en producción.
+     */
+    @POST
+    @Path("/init-data")
+    public Response initializeTestData() {
+        try {
+            // 1. Crear roles si no existen
+            if (roleRepository.findByNombre("USER").isEmpty()) {
+                Role userRole = new Role();
+                userRole.setNombre("USER");
+                userRole.setDescripcion("Usuario estándar con permisos básicos");
+                userRole.setActivo(true);
+                roleRepository.save(userRole);
+            }
+
+            if (roleRepository.findByNombre("ADMIN").isEmpty()) {
+                Role adminRole = new Role();
+                adminRole.setNombre("ADMIN");
+                adminRole.setDescripcion("Administrador con todos los permisos");
+                adminRole.setActivo(true);
+                roleRepository.save(adminRole);
+            }
+
+            // 2. Crear usuario de prueba si no existe
+            if (usuarioService.findByUsername("testuser").isEmpty()) {
+                Usuario testUser = new Usuario();
+                testUser.setUsername("testuser");
+                testUser.setEmail("test@example.com");
+                // Password: "password123"
+                testUser.setPasswordHash(BCrypt.hashpw("password123", BCrypt.gensalt()));
+                testUser.setRole(roleRepository.findByNombre("USER").orElseThrow());
+                testUser.setEstado(EstadoUsuario.ACTIVO);
+                usuarioService.save(testUser);
+            }
+
+            return Response.ok()
+                    .entity("{\"message\": \"Datos de prueba inicializados correctamente\"}")
+                    .build();
+
+        } catch (Exception e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("{\"error\": \"Error al inicializar datos: " + e.getMessage() + "\"}")
+                    .build();
         }
     }
 }

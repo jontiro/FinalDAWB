@@ -1,29 +1,39 @@
 package com.dawb.finaldawb.repository;
 
 import com.dawb.finaldawb.domain.Usuario;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.NoResultException;
-import jakarta.persistence.PersistenceContext;
-import jakarta.transaction.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 
-@Transactional
+@ApplicationScoped
 public class UsuarioRepository {
 
-    // Inyección del EntityManager para interactuar con JPA
-    @PersistenceContext
+    // Inyección del EntityManager para interactuar con JPA (RESOURCE_LOCAL)
+    @Inject
     private EntityManager em;
 
     // --- Operaciones CRUD Básicas ---
 
     public Usuario save(Usuario usuario) {
-        if (usuario.getId() == null) {
-            em.persist(usuario); // INSERT
+        EntityTransaction tx = em.getTransaction();
+        try {
+            if (!tx.isActive()) tx.begin();
+            if (usuario.getId() == null) {
+                em.persist(usuario); // INSERT
+                em.flush(); // Forzar sincronización para obtener el ID generado
+            } else {
+                usuario = em.merge(usuario); // UPDATE
+            }
+            tx.commit();
             return usuario;
-        } else {
-            return em.merge(usuario); // UPDATE
+        } catch (RuntimeException e) {
+            if (tx.isActive()) tx.rollback();
+            throw e;
         }
     }
 
@@ -36,7 +46,15 @@ public class UsuarioRepository {
     }
 
     public void delete(Usuario usuario) {
-        em.remove(em.contains(usuario) ? usuario : em.merge(usuario));
+        EntityTransaction tx = em.getTransaction();
+        try {
+            if (!tx.isActive()) tx.begin();
+            em.remove(em.contains(usuario) ? usuario : em.merge(usuario));
+            tx.commit();
+        } catch (RuntimeException e) {
+            if (tx.isActive()) tx.rollback();
+            throw e;
+        }
     }
 
     // --- Consultas Personalizadas (necesarias para la lógica de negocio) ---

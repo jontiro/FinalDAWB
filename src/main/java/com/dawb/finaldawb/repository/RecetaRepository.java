@@ -2,17 +2,17 @@ package com.dawb.finaldawb.repository;
 
 import com.dawb.finaldawb.domain.Receta;
 import com.dawb.finaldawb.domain.Usuario;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
-import jakarta.transaction.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 
-@Transactional
+@ApplicationScoped
 public class RecetaRepository {
 
-    @PersistenceContext
+    @Inject
     private EntityManager em;
 
     // --- Operaciones CRUD Básicas ---
@@ -20,6 +20,7 @@ public class RecetaRepository {
     public Receta save(Receta receta) {
         if (receta.getId() == null) {
             em.persist(receta);
+            em.flush(); // Forzar sincronización para obtener el ID generado
             return receta;
         } else {
             return em.merge(receta);

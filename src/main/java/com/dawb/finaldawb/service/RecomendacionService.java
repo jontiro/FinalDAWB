@@ -16,9 +16,13 @@ import java.util.Optional;
 @Transactional
 public class RecomendacionService {
 
-    private final RecomendacionRepository recomendacionRepository;
-    private final UsuarioRepository usuarioRepository;
-    private final TipoService tipoService; // Usamos el Service para reglas de negocio de Tipo
+    private RecomendacionRepository recomendacionRepository;
+    private UsuarioRepository usuarioRepository;
+    private TipoService tipoService;
+
+    // Constructor vacío requerido por CDI
+    protected RecomendacionService() {
+    }
 
     // Inyección por constructor
     @Inject

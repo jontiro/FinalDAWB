@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recetas - Cocina Social</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="assets/css/common.css">
+    <link rel="stylesheet" href="assets/css/recetas.css">
+</head>
+<body class="bg-gray-50">
+
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg fixed w-full top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <i class="fas fa-utensils text-3xl text-purple-600 mr-3"></i>
+                    <span class="text-2xl font-bold text-purple-600">Cocina Social</span>
+                </div>
+                <div class="hidden md:flex space-x-8">
+                    <a href="home.html" class="text-gray-700 hover:text-purple-600 transition">Inicio</a>
+                    <a href="recetas.html" class="text-purple-600 font-semibold">Recetas</a>
+                    <a href="lugares.html" class="text-gray-700 hover:text-purple-600 transition">Lugares</a>
+                    <a href="comunidad.html" class="text-gray-700 hover:text-purple-600 transition">Comunidad</a>
+                </div>
+                <div class="flex space-x-3" id="nav-buttons"></div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header -->
+    <div class="pt-24 pb-12 gradient-bg text-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h1 class="text-4xl md:text-5xl font-bold mb-4">🍳 Explora Nuestras Recetas</h1>
+            <p class="text-xl text-purple-100">Descubre deliciosas recetas de la comunidad</p>
+        </div>
+    </div>
+
+    <!-- Filters & Search -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 mb-8">
+        <div class="bg-white rounded-lg shadow-lg p-6">
+            <div class="grid md:grid-cols-4 gap-4">
+                <input type="text" id="search-input" placeholder="🔍 Buscar recetas..."
+                       class="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
+                <select id="filter-privacidad" class="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
+                    <option value="">Todas las recetas</option>
+                    <option value="false">Solo públicas</option>
+                    <option value="true">Solo privadas</option>
+                </select>
+                <button onclick="loadRecetas()" class="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition">
+                    <i class="fas fa-search mr-2"></i> Buscar
+                </button>
+                <button onclick="showCreateModal()" id="btn-crear-receta" class="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">
+                    <i class="fas fa-plus mr-2"></i> Nueva Receta
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recetas Grid -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
+        <div id="recetas-grid" class="grid md:grid-cols-3 gap-8">
+            <div class="col-span-3 text-center py-12">
+                <i class="fas fa-spinner fa-spin text-4xl text-purple-600 mb-4"></i>
+                <p class="text-gray-600">Cargando recetas deliciosas...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Crear/Editar Receta -->
+    <div id="receta-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-2xl w-full p-8 relative max-h-[90vh] overflow-y-auto">
+            <button onclick="closeRecetaModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+                <i class="fas fa-times text-2xl"></i>
+            </button>
+
+            <h3 class="text-3xl font-bold text-gray-900 mb-6">
+                <i class="fas fa-utensils text-purple-600 mr-2"></i>
+                <span id="modal-title">Nueva Receta</span>
+            </h3>
+
+            <form id="receta-form" class="space-y-4">
+                <input type="hidden" id="receta-id">
+
+                <div>
+                    <label class="block text-gray-700 mb-2 font-medium">Título *</label>
+                    <input type="text" id="receta-titulo" required
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
+                </div>
+
+                <div>
+                    <label class="block text-gray-700 mb-2 font-medium">Descripción *</label>
+                    <textarea id="receta-descripcion" required rows="4"
+                              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600"></textarea>
+                </div>
+
+                <div>
+                    <label class="block text-gray-700 mb-2 font-medium">Tiempo de Preparación (minutos) *</label>
+                    <input type="number" id="receta-tiempo" required min="1"
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
+                </div>
+
+                <div class="flex items-center space-x-2">
+                    <input type="checkbox" id="receta-privacidad" class="w-5 h-5 text-purple-600 rounded">
+                    <label for="receta-privacidad" class="text-gray-700 font-medium">
+                        🔒 Receta privada (solo tú podrás verla)
+                    </label>
+                </div>
+
+                <button type="submit"
+                        class="w-full py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg font-semibold hover:from-purple-700 hover:to-indigo-700 transition">
+                    <i class="fas fa-save mr-2"></i> Guardar Receta
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div id="footer"></div>
+
+    <!-- Modals -->
+    <div id="auth-modal"></div>
+    <div id="toast"></div>
+
+    <script src="assets/js/auth.js"></script>
+    <script src="assets/js/components.js"></script>
+    <script>
+        Components.loadFooter();
+        Components.loadAuthModal();
+        Components.loadToast();
+
+        let currentRecetaId = null;
+
+        // Verificar autenticación para crear recetas
+        function checkAuthForCreate() {
+            const btnCrear = document.getElementById('btn-crear-receta');
+            if (!Auth.isLoggedIn()) {
+                btnCrear.classList.add('hidden');
+            }
+        }
+
+        // Mostrar modal de creación
+        function showCreateModal() {
+            if (!Auth.isLoggedIn()) {
+                Utils.showToast('Debes iniciar sesión', 'Regístrate o inicia sesión para crear recetas', 'info');
+                Auth.showModal('login');
+                return;
+            }
+
+            document.getElementById('modal-title').textContent = 'Nueva Receta';
+            document.getElementById('receta-form').reset();
+            document.getElementById('receta-id').value = '';
+            currentRecetaId = null;
+            document.getElementById('receta-modal').classList.remove('hidden');
+        }
+
+        function closeRecetaModal() {
+            document.getElementById('receta-modal').classList.add('hidden');
+        }
+
+        // Cargar recetas
+        async function loadRecetas() {
+            const grid = document.getElementById('recetas-grid');
+            grid.innerHTML = '<div class="col-span-3 text-center py-12"><i class="fas fa-spinner fa-spin text-4xl text-purple-600"></i></div>';
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/recetas`);
+                const recetas = await response.json();
+
+                if (recetas.length === 0) {
+                    grid.innerHTML = `
+                        <div class="col-span-3 text-center py-12">
+                            <i class="fas fa-inbox text-6xl text-gray-300 mb-4"></i>
+                            <p class="text-gray-600 text-lg">No hay recetas disponibles aún.</p>
+                            <p class="text-gray-500">¡Sé el primero en compartir una receta!</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                const user = Auth.getUser();
+
+                grid.innerHTML = recetas.map(receta => {
+                    const canEdit = user && receta.creadorId === user.id;
+                    return `
+                        <div class="recipe-card bg-white rounded-2xl shadow-lg overflow-hidden">
+                            <div class="h-48 bg-gradient-to-br from-orange-400 to-pink-500 flex items-center justify-center">
+                                <i class="fas fa-utensils text-white text-6xl"></i>
+                            </div>
+                            <div class="p-6">
+                                <div class="flex items-center justify-between mb-2">
+                                    <h3 class="text-xl font-bold text-gray-900">${receta.titulo}</h3>
+                                    ${receta.privacidad ? '<span class="text-xs bg-red-100 text-red-600 px-2 py-1 rounded">🔒 Privada</span>' : '<span class="text-xs bg-green-100 text-green-600 px-2 py-1 rounded">🌐 Pública</span>'}
+                                </div>
+                                <p class="text-gray-600 mb-4 line-clamp-2">${receta.descripcion || 'Sin descripción'}</p>
+                                <div class="flex items-center justify-between text-sm text-gray-500 mb-4">
+                                    <span><i class="far fa-clock mr-1"></i> ${receta.tiempoPreparacion} min</span>
+                                    <span><i class="far fa-user mr-1"></i> Por: ${receta.creadorUsername || 'Anónimo'}</span>
+                                </div>
+                                ${canEdit ? `
+                                    <div class="flex space-x-2">
+                                        <button onclick="editReceta(${receta.id})" class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+                                            <i class="fas fa-edit mr-1"></i> Editar
+                                        </button>
+                                        <button onclick="deleteReceta(${receta.id})" class="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition">
+                                            <i class="fas fa-trash mr-1"></i> Eliminar
+                                        </button>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                Utils.showToast('Recetas cargadas', `${recetas.length} receta(s) encontrada(s)`);
+            } catch (error) {
+                grid.innerHTML = '<div class="col-span-3 text-center py-12"><p class="text-red-600">Error al cargar recetas</p></div>';
+                Utils.showToast('Error', 'No se pudieron cargar las recetas', 'error');
+            }
+        }
+
+        // Crear/Actualizar receta
+        document.getElementById('receta-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const payload = {
+                titulo: document.getElementById('receta-titulo').value,
+                descripcion: document.getElementById('receta-descripcion').value,
+                tiempoPreparacion: parseInt(document.getElementById('receta-tiempo').value),
+                privacidad: document.getElementById('receta-privacidad').checked
+            };
+
+            try {
+                const url = currentRecetaId
+                    ? `${API_BASE_URL}/recetas/${currentRecetaId}`
+                    : `${API_BASE_URL}/recetas`;
+                const method = currentRecetaId ? 'PUT' : 'POST';
+
+                const response = await fetch(url, {
+                    method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    Utils.showToast('¡Éxito!', `Receta ${currentRecetaId ? 'actualizada' : 'creada'} correctamente`, 'success');
+                    closeRecetaModal();
+                    loadRecetas();
+                } else {
+                    Utils.showToast('Error', data.error || data.message || 'Error al guardar', 'error');
+                }
+            } catch (error) {
+                Utils.showToast('Error', 'No se pudo guardar la receta', 'error');
+            }
+        });
+
+        // Editar receta
+        async function editReceta(id) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/recetas/${id}`);
+                const receta = await response.json();
+
+                if (response.ok) {
+                    document.getElementById('modal-title').textContent = 'Editar Receta';
+                    document.getElementById('receta-id').value = receta.id;
+                    document.getElementById('receta-titulo').value = receta.titulo;
+                    document.getElementById('receta-descripcion').value = receta.descripcion;
+                    document.getElementById('receta-tiempo').value = receta.tiempoPreparacion;
+                    document.getElementById('receta-privacidad').checked = receta.privacidad;
+                    currentRecetaId = id;
+                    document.getElementById('receta-modal').classList.remove('hidden');
+                }
+            } catch (error) {
+                Utils.showToast('Error', 'No se pudo cargar la receta', 'error');
+            }
+        }
+
+        // Eliminar receta
+        async function deleteReceta(id) {
+            if (!confirm('¿Estás seguro de eliminar esta receta?')) return;
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/recetas/${id}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    Utils.showToast('Eliminada', 'Receta eliminada correctamente', 'success');
+                    loadRecetas();
+                } else {
+                    Utils.showToast('Error', 'No se pudo eliminar la receta', 'error');
+                }
+            } catch (error) {
+                Utils.showToast('Error', 'No se pudo eliminar la receta', 'error');
+            }
+        }
+
+        // Inicializar
+        window.addEventListener('DOMContentLoaded', () => {
+            checkAuthForCreate();
+            loadRecetas();
+        });
+    </script>
+</body>
+</html>
+

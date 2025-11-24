@@ -21,13 +21,17 @@ import java.util.Optional;
 @Transactional
 public class RecetaService {
 
-    // 1. Los campos inyectados ahora son finales (final)
-    private final RecetaRepository recetaRepository;
-    private final RecetaPasoRepository pasoRepository;
-    private final TagRepository tagRepository;
-    private final RecetaTagRepository recetaTagRepository;
+    // Campos sin final para permitir el constructor vacío
+    private RecetaRepository recetaRepository;
+    private RecetaPasoRepository pasoRepository;
+    private TagRepository tagRepository;
+    private RecetaTagRepository recetaTagRepository;
 
-    // 2. CONSTRUCTOR CON ARGUMENTOS (@Inject en el constructor)
+    // Constructor vacío requerido por CDI
+    protected RecetaService() {
+    }
+
+    // Inyección por constructor
     @Inject
     public RecetaService(RecetaRepository recetaRepository,
                          RecetaPasoRepository pasoRepository,

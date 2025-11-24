@@ -2,21 +2,22 @@ package com.dawb.finaldawb.repository;
 
 import com.dawb.finaldawb.domain.RecetaTag;
 import com.dawb.finaldawb.domain.RecetaTagId;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
-import jakarta.transaction.Transactional;
 import java.util.Optional;
 
-@Transactional
+@ApplicationScoped
 public class RecetaTagRepository {
 
-    @PersistenceContext
+    @Inject
     private EntityManager em;
 
     public RecetaTag save(RecetaTag recetaTag) {
         if (recetaTag.getId() == null || recetaTag.getId().getRecetaId() == null) {
             // Para entidades con claves compuestas, usamos persist directamente
             em.persist(recetaTag);
+            em.flush(); // Forzar sincronización para obtener el ID generado
             return recetaTag;
         } else {
             return em.merge(recetaTag);

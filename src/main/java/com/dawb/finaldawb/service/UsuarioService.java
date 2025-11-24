@@ -7,12 +7,10 @@ import com.dawb.finaldawb.repository.RoleRepository;
 import com.dawb.finaldawb.repository.UsuarioRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 
 @ApplicationScoped
-@Transactional // Asegura que las operaciones de modificación se ejecuten en una transacción
 public class UsuarioService {
 
     @Inject
@@ -120,5 +118,23 @@ public class UsuarioService {
             return true;
         }
         return false;
+    }
+
+    /**
+     * Busca un usuario por nombre de usuario.
+     * @param username Nombre de usuario.
+     * @return Optional que contiene el Usuario o está vacío.
+     */
+    public Optional<Usuario> findByUsername(String username) {
+        return usuarioRepository.findByUsername(username);
+    }
+
+    /**
+     * Guarda o actualiza un usuario en la base de datos.
+     * @param usuario Usuario a guardar.
+     * @return Usuario guardado.
+     */
+    public Usuario save(Usuario usuario) {
+        return usuarioRepository.save(usuario);
     }
 }

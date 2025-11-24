@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lugares - Cocina Social</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="assets/css/common.css">
+    <link rel="stylesheet" href="assets/css/lugares.css">
+</head>
+<body class="bg-gray-50">
+
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg fixed w-full top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <i class="fas fa-utensils text-3xl text-purple-600 mr-3"></i>
+                    <span class="text-2xl font-bold text-purple-600">Cocina Social</span>
+                </div>
+                <div class="hidden md:flex space-x-8">
+                    <a href="home.html" class="text-gray-700 hover:text-purple-600 transition">Inicio</a>
+                    <a href="recetas.html" class="text-gray-700 hover:text-purple-600 transition">Recetas</a>
+                    <a href="lugares.html" class="text-pink-600 font-semibold">Lugares</a>
+                    <a href="comunidad.html" class="text-gray-700 hover:text-purple-600 transition">Comunidad</a>
+                </div>
+                <div class="flex space-x-3" id="nav-buttons"></div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header -->
+    <div class="pt-24 pb-12 gradient-bg text-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h1 class="text-4xl md:text-5xl font-bold mb-4">📍 Descubre Lugares Increíbles</h1>
+            <p class="text-xl text-pink-100">Los mejores restaurantes recomendados por la comunidad</p>
+        </div>
+    </div>
+
+    <!-- Filters & Search -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 mb-8">
+        <div class="bg-white rounded-lg shadow-lg p-6">
+            <div class="grid md:grid-cols-4 gap-4">
+                <input type="text" id="search-input" placeholder="🔍 Buscar lugares..."
+                       class="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-600">
+                <input type="text" id="filter-ciudad" placeholder="Ciudad"
+                       class="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-600">
+                <button onclick="loadLugares()" class="px-6 py-3 bg-pink-600 text-white rounded-lg hover:bg-pink-700 transition">
+                    <i class="fas fa-search mr-2"></i> Buscar
+                </button>
+                <button onclick="showCreateModal()" id="btn-crear-lugar" class="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">
+                    <i class="fas fa-plus mr-2"></i> Recomendar Lugar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lugares Grid -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
+        <div id="lugares-grid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div class="col-span-3 text-center py-12">
+                <i class="fas fa-spinner fa-spin text-4xl text-pink-600 mb-4"></i>
+                <p class="text-gray-600">Descubriendo lugares increíbles...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Crear/Editar Lugar -->
+    <div id="lugar-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-2xl w-full p-8 relative max-h-[90vh] overflow-y-auto">
+            <button onclick="closeLugarModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+                <i class="fas fa-times text-2xl"></i>
+            </button>
+
+            <h3 class="text-3xl font-bold text-gray-900 mb-6">
+                <i class="fas fa-map-marker-alt text-pink-600 mr-2"></i>
+                <span id="modal-title">Recomendar Lugar</span>
+            </h3>
+
+            <form id="lugar-form" class="space-y-4">
+                <input type="hidden" id="lugar-id">
+
+                <div>
+                    <label class="block text-gray-700 mb-2 font-medium">Nombre del Lugar *</label>
+                    <input type="text" id="lugar-nombre" required
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-600">
+                </div>
+
+                <div>
+                    <label class="block text-gray-700 mb-2 font-medium">Dirección Completa *</label>
+                    <textarea id="lugar-direccion" required rows="3"
+                              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-600"></textarea>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-gray-700 mb-2 font-medium">Ciudad</label>
+                        <input type="text" id="lugar-ciudad"
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-600">
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 mb-2 font-medium">País</label>
+                        <input type="text" id="lugar-pais"
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-600">
+                    </div>
+                </div>
+
+                <button type="submit"
+                        class="w-full py-3 bg-gradient-to-r from-pink-600 to-rose-600 text-white rounded-lg font-semibold hover:from-pink-700 hover:to-rose-700 transition">
+                    <i class="fas fa-save mr-2"></i> Guardar Lugar
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div id="footer"></div>
+
+    <!-- Modals -->
+    <div id="auth-modal"></div>
+    <div id="toast"></div>
+
+    <script src="assets/js/auth.js"></script>
+    <script src="assets/js/components.js"></script>
+    <script>
+        Components.loadFooter();
+        Components.loadAuthModal();
+        Components.loadToast();
+
+        let currentLugarId = null;
+
+        function checkAuthForCreate() {
+            const btnCrear = document.getElementById('btn-crear-lugar');
+            if (!Auth.isLoggedIn()) {
+                btnCrear.classList.add('hidden');
+            }
+        }
+
+        function showCreateModal() {
+            if (!Auth.isLoggedIn()) {
+                Utils.showToast('Debes iniciar sesión', 'Regístrate o inicia sesión para recomendar lugares', 'info');
+                Auth.showModal('login');
+                return;
+            }
+
+            document.getElementById('modal-title').textContent = 'Recomendar Lugar';
+            document.getElementById('lugar-form').reset();
+            document.getElementById('lugar-id').value = '';
+            currentLugarId = null;
+            document.getElementById('lugar-modal').classList.remove('hidden');
+        }
+
+        function closeLugarModal() {
+            document.getElementById('lugar-modal').classList.add('hidden');
+        }
+
+        async function loadLugares() {
+            const grid = document.getElementById('lugares-grid');
+            grid.innerHTML = '<div class="col-span-3 text-center py-12"><i class="fas fa-spinner fa-spin text-4xl text-pink-600"></i></div>';
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/lugares`);
+                const lugares = await response.json();
+
+                if (lugares.length === 0) {
+                    grid.innerHTML = `
+                        <div class="col-span-3 text-center py-12">
+                            <i class="fas fa-map-marked-alt text-6xl text-gray-300 mb-4"></i>
+                            <p class="text-gray-600 text-lg">No hay lugares recomendados aún.</p>
+                            <p class="text-gray-500">¡Comparte tu lugar favorito!</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                const user = Auth.getUser();
+
+                grid.innerHTML = lugares.map(lugar => {
+                    const canEdit = user && lugar.autorId === user.id;
+                    return `
+                        <div class="lugar-card bg-white rounded-2xl shadow-lg overflow-hidden">
+                            <div class="h-40 bg-gradient-to-br from-pink-400 to-purple-500 flex items-center justify-center">
+                                <i class="fas fa-map-marker-alt text-white text-5xl"></i>
+                            </div>
+                            <div class="p-6">
+                                <h3 class="text-xl font-bold text-gray-900 mb-2">${lugar.nombre}</h3>
+                                <p class="text-gray-600 mb-2 flex items-start">
+                                    <i class="fas fa-map-pin text-pink-600 mr-2 mt-1"></i>
+                                    <span>${lugar.direccion}</span>
+                                </p>
+                                ${lugar.ciudad ? `
+                                    <p class="text-sm text-gray-500 mb-4">
+                                        <i class="fas fa-city mr-2"></i>${lugar.ciudad}${lugar.pais ? ', ' + lugar.pais : ''}
+                                    </p>
+                                ` : ''}
+                                <p class="text-xs text-gray-400 mb-4">
+                                    <i class="far fa-user mr-1"></i> Recomendado por: ${lugar.autorUsername || 'Anónimo'}
+                                </p>
+                                ${canEdit ? `
+                                    <div class="flex space-x-2">
+                                        <button onclick="editLugar(${lugar.id})" class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+                                            <i class="fas fa-edit mr-1"></i> Editar
+                                        </button>
+                                        <button onclick="deleteLugar(${lugar.id})" class="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition">
+                                            <i class="fas fa-trash mr-1"></i> Eliminar
+                                        </button>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                Utils.showToast('Lugares cargados', `${lugares.length} lugar(es) encontrado(s)`);
+            } catch (error) {
+                grid.innerHTML = '<div class="col-span-3 text-center py-12"><p class="text-red-600">Error al cargar lugares</p></div>';
+                Utils.showToast('Error', 'No se pudieron cargar los lugares', 'error');
+            }
+        }
+
+        document.getElementById('lugar-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const payload = {
+                nombre: document.getElementById('lugar-nombre').value,
+                direccion: document.getElementById('lugar-direccion').value,
+                ciudad: document.getElementById('lugar-ciudad').value || undefined,
+                pais: document.getElementById('lugar-pais').value || undefined
+            };
+
+            try {
+                const url = currentLugarId
+                    ? `${API_BASE_URL}/lugares/${currentLugarId}`
+                    : `${API_BASE_URL}/lugares`;
+                const method = currentLugarId ? 'PUT' : 'POST';
+
+                const response = await fetch(url, {
+                    method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    Utils.showToast('¡Éxito!', `Lugar ${currentLugarId ? 'actualizado' : 'creado'} correctamente`, 'success');
+                    closeLugarModal();
+                    loadLugares();
+                } else {
+                    Utils.showToast('Error', data.error || data.message || 'Error al guardar', 'error');
+                }
+            } catch (error) {
+                Utils.showToast('Error', 'No se pudo guardar el lugar', 'error');
+            }
+        });
+
+        async function editLugar(id) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/lugares/${id}`);
+                const lugar = await response.json();
+
+                if (response.ok) {
+                    document.getElementById('modal-title').textContent = 'Editar Lugar';
+                    document.getElementById('lugar-id').value = lugar.id;
+                    document.getElementById('lugar-nombre').value = lugar.nombre;
+                    document.getElementById('lugar-direccion').value = lugar.direccion;
+                    document.getElementById('lugar-ciudad').value = lugar.ciudad || '';
+                    document.getElementById('lugar-pais').value = lugar.pais || '';
+                    currentLugarId = id;
+                    document.getElementById('lugar-modal').classList.remove('hidden');
+                }
+            } catch (error) {
+                Utils.showToast('Error', 'No se pudo cargar el lugar', 'error');
+            }
+        }
+
+        async function deleteLugar(id) {
+            if (!confirm('¿Estás seguro de eliminar este lugar?')) return;
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/lugares/${id}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    Utils.showToast('Eliminado', 'Lugar eliminado correctamente', 'success');
+                    loadLugares();
+                } else {
+                    Utils.showToast('Error', 'No se pudo eliminar el lugar', 'error');
+                }
+            } catch (error) {
+                Utils.showToast('Error', 'No se pudo eliminar el lugar', 'error');
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            checkAuthForCreate();
+            loadLugares();
+        });
+    </script>
+</body>
+</html>
+

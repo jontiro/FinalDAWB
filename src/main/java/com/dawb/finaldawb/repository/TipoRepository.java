@@ -1,23 +1,24 @@
 package com.dawb.finaldawb.repository;
 
 import com.dawb.finaldawb.domain.Tipo;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
-import jakarta.persistence.PersistenceContext;
-import jakarta.transaction.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 
-@Transactional
+@ApplicationScoped
 public class TipoRepository {
 
-    @PersistenceContext
+    @Inject
     private EntityManager em;
 
     public Tipo save(Tipo tipo) {
         if (tipo.getId() == null) {
             em.persist(tipo);
+            em.flush(); // Forzar sincronización para obtener el ID generado
             return tipo;
         } else {
             return em.merge(tipo);

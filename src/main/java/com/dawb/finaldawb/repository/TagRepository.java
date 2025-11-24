@@ -1,22 +1,23 @@
 package com.dawb.finaldawb.repository;
 
 import com.dawb.finaldawb.domain.Tag;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
-import jakarta.persistence.PersistenceContext;
-import jakarta.transaction.Transactional;
 
 import java.util.Optional;
 
-@Transactional
+@ApplicationScoped
 public class TagRepository {
 
-    @PersistenceContext
+    @Inject
     private EntityManager em;
 
     public Tag save(Tag tag) {
         if (tag.getId() == null) {
             em.persist(tag);
+            em.flush(); // Forzar sincronización para obtener el ID generado
             return tag;
         } else {
             return em.merge(tag);

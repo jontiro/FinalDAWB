@@ -15,8 +15,12 @@ import java.util.Optional;
 @Transactional
 public class LugarService {
 
-    private final LugarRepository lugarRepository;
-    private final UsuarioRepository usuarioRepository;
+    private LugarRepository lugarRepository;
+    private UsuarioRepository usuarioRepository;
+
+    // Constructor vacío requerido por CDI
+    protected LugarService() {
+    }
 
     // Inyección por constructor
     @Inject

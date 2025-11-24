@@ -1,0 +1,19 @@
+/* comunidad.css - Estilos para la página de comunidad */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+body {
+    font-family: 'Poppins', sans-serif;
+}
+
+.gradient-bg {
+    background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+}
+
+.comment-card {
+    transition: all 0.3s ease;
+}
+
+.comment-card:hover {
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+}
+
