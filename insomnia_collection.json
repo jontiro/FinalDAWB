@@ -1,0 +1,172 @@
+{
+  "_type": "export",
+  "__export_format": 4,
+  "__export_date": "2025-11-23T22:50:00.000Z",
+  "__export_source": "insomnia.desktop.app:v2023.5.8",
+  "resources": [
+    {
+      "_id": "wrk_finaldawb",
+      "_type": "workspace",
+      "name": "FinalDAWB API",
+      "description": "API REST para la aplicación FinalDAWB - Actualizado"
+    },
+    {
+      "_id": "env_base",
+      "_type": "environment",
+      "name": "Base Environment",
+      "data": {
+        "base_url": "http://localhost:8080/FinalDAWB_war_exploded/api",
+        "user_id": "1",
+        "token": ""
+      }
+    },
+    {
+      "_id": "req_init_data",
+      "_type": "request",
+      "name": "Inicializar Datos de Prueba",
+      "method": "POST",
+      "url": "{{ base_url }}/admin/init-data",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {},
+      "description": "Inicializa roles y usuario de prueba en la base de datos"
+    },
+    {
+      "_id": "req_register",
+      "_type": "request",
+      "name": "Registrar Usuario",
+      "method": "POST",
+      "url": "{{ base_url }}/auth/register",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"username\": \"usuario1\",\n  \"email\": \"usuario1@example.com\",\n  \"password\": \"password123\"\n}"
+      },
+      "description": "Registra un nuevo usuario en el sistema"
+    },
+    {
+      "_id": "req_login",
+      "_type": "request",
+      "name": "Login",
+      "method": "POST",
+      "url": "{{ base_url }}/auth/login",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"usernameOrEmail\": \"testuser\",\n  \"password\": \"password123\"\n}"
+      },
+      "description": "Inicia sesión con un usuario existente"
+    },
+    {
+      "_id": "req_create_receta",
+      "_type": "request",
+      "name": "Crear Receta",
+      "method": "POST",
+      "url": "{{ base_url }}/recetas",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"titulo\": \"Tacos al Pastor\",\n  \"descripcion\": \"Deliciosos tacos mexicanos con carne marinada\",\n  \"tiempoPreparacion\": 45,\n  \"creadorId\": 1,\n  \"privacidad\": false,\n  \"pasos\": [\n    {\n      \"orden\": 1,\n      \"descripcion\": \"Marinar la carne con achiote, vinagre y especias durante 2 horas\"\n    },\n    {\n      \"orden\": 2,\n      \"descripcion\": \"Cocinar la carne en el trompo o en un sartén a fuego medio\"\n    },\n    {\n      \"orden\": 3,\n      \"descripcion\": \"Cortar la carne en trozos pequeños\"\n    },\n    {\n      \"orden\": 4,\n      \"descripcion\": \"Servir en tortillas de maíz con piña, cilantro y cebolla\"\n    }\n  ],\n  \"tags\": [\"Mexicano\", \"Rápido\"]\n}"
+      },
+      "description": "Crea una nueva receta en el sistema"
+    },
+    {
+      "_id": "req_get_recetas",
+      "_type": "request",
+      "name": "Obtener Todas las Recetas",
+      "method": "GET",
+      "url": "{{ base_url }}/recetas",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "description": "Obtiene todas las recetas públicas"
+    },
+    {
+      "_id": "req_get_receta_by_id",
+      "_type": "request",
+      "name": "Obtener Receta por ID",
+      "method": "GET",
+      "url": "{{ base_url }}/recetas/1",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "description": "Obtiene una receta específica por su ID"
+    },
+    {
+      "_id": "req_create_receta_2",
+      "_type": "request",
+      "name": "Crear Receta - Pozole",
+      "method": "POST",
+      "url": "{{ base_url }}/recetas",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"titulo\": \"Pozole Rojo\",\n  \"descripcion\": \"Platillo tradicional mexicano perfecto para ocasiones especiales\",\n  \"tiempoPreparacion\": 120,\n  \"creadorId\": 1,\n  \"privacidad\": false,\n  \"pasos\": [\n    {\n      \"orden\": 1,\n      \"descripcion\": \"Cocinar el maíz cacahuazintle con agua y cal durante 2 horas\"\n    },\n    {\n      \"orden\": 2,\n      \"descripcion\": \"Cocer la carne de cerdo con ajo y cebolla\"\n    },\n    {\n      \"orden\": 3,\n      \"descripcion\": \"Preparar la salsa con chiles guajillo\"\n    },\n    {\n      \"orden\": 4,\n      \"descripcion\": \"Mezclar todo y servir con lechuga, rábano, orégano y tostadas\"\n    }\n  ],\n  \"tags\": [\"Mexicano\", \"Saludable\"]\n}"
+      },
+      "description": "Crea otra receta de ejemplo"
+    },
+    {
+      "_id": "req_create_receta_3",
+      "_type": "request",
+      "name": "Crear Receta - Ensalada",
+      "method": "POST",
+      "url": "{{ base_url }}/recetas",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"titulo\": \"Ensalada César Vegana\",\n  \"descripcion\": \"Versión saludable y vegana de la clásica ensalada César\",\n  \"tiempoPreparacion\": 15,\n  \"creadorId\": 1,\n  \"privacidad\": false,\n  \"pasos\": [\n    {\n      \"orden\": 1,\n      \"descripcion\": \"Lavar y cortar la lechuga romana\"\n    },\n    {\n      \"orden\": 2,\n      \"descripcion\": \"Preparar el aderezo con tahini, ajo, limón y levadura nutricional\"\n    },\n    {\n      \"orden\": 3,\n      \"descripcion\": \"Hacer crutones con pan integral\"\n    },\n    {\n      \"orden\": 4,\n      \"descripcion\": \"Mezclar todo y servir inmediatamente\"\n    }\n  ],\n  \"tags\": [\"Vegano\", \"Rápido\", \"Saludable\"]\n}"
+      },
+      "description": "Crea una receta vegana rápida"
+    },
+    {
+      "_id": "req_delete_receta",
+      "_type": "request",
+      "name": "Eliminar Receta",
+      "method": "DELETE",
+      "url": "{{ base_url }}/recetas/1",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "description": "Elimina una receta por su ID"
+    }
+  ]
+}
+

@@ -1,0 +1,369 @@
+{
+  "_type": "export",
+  "__export_format": 4,
+  "__export_date": "2025-11-23T22:50:00.000Z",
+  "__export_source": "insomnia.desktop.app:v2023.5.8",
+  "resources": [
+    {
+      "_id": "wrk_finaldawb",
+      "_type": "workspace",
+      "name": "FinalDAWB API - Completo",
+      "description": "API REST completa para FinalDAWB con todos los endpoints"
+    },
+    {
+      "_id": "env_base",
+      "_type": "environment",
+      "name": "Base Environment",
+      "data": {
+        "base_url": "http://localhost:8080/FinalDAWB_war_exploded/api",
+        "user_id": "1",
+        "username": "testuser",
+        "password": "password123"
+      }
+    },
+    {
+      "_id": "fld_auth",
+      "_type": "request_group",
+      "name": "Auth - Autenticación",
+      "description": "Endpoints de autenticación y registro"
+    },
+    {
+      "_id": "req_register",
+      "_type": "request",
+      "parentId": "fld_auth",
+      "name": "Registrar Usuario",
+      "method": "POST",
+      "url": "{{ base_url }}/auth/register",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"username\": \"usuario1\",\n  \"email\": \"usuario1@example.com\",\n  \"password\": \"password123\"\n}"
+      },
+      "description": "Registra un nuevo usuario en el sistema"
+    },
+    {
+      "_id": "req_login",
+      "_type": "request",
+      "parentId": "fld_auth",
+      "name": "Login",
+      "method": "POST",
+      "url": "{{ base_url }}/auth/login",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"usernameOrEmail\": \"{{ username }}\",\n  \"password\": \"{{ password }}\"\n}"
+      },
+      "description": "Inicia sesión con un usuario existente"
+    },
+    {
+      "_id": "fld_recetas",
+      "_type": "request_group",
+      "name": "Recetas",
+      "description": "CRUD completo de recetas"
+    },
+    {
+      "_id": "req_get_recetas",
+      "_type": "request",
+      "parentId": "fld_recetas",
+      "name": "Obtener Todas las Recetas",
+      "method": "GET",
+      "url": "{{ base_url }}/recetas",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "description": "Obtiene todas las recetas públicas"
+    },
+    {
+      "_id": "req_get_receta_by_id",
+      "_type": "request",
+      "parentId": "fld_recetas",
+      "name": "Obtener Receta por ID",
+      "method": "GET",
+      "url": "{{ base_url }}/recetas/1",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "description": "Obtiene una receta específica por su ID"
+    },
+    {
+      "_id": "req_create_receta_1",
+      "_type": "request",
+      "parentId": "fld_recetas",
+      "name": "Crear Receta - Tacos al Pastor",
+      "method": "POST",
+      "url": "{{ base_url }}/recetas",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"titulo\": \"Tacos al Pastor\",\n  \"descripcion\": \"Deliciosos tacos mexicanos con carne marinada\",\n  \"tiempoPreparacion\": 45,\n  \"creadorId\": {{ user_id }},\n  \"privacidad\": false,\n  \"pasos\": [\n    {\n      \"orden\": 1,\n      \"descripcion\": \"Marinar la carne con achiote, vinagre y especias durante 2 horas\"\n    },\n    {\n      \"orden\": 2,\n      \"descripcion\": \"Cocinar la carne en el trompo o en un sartén a fuego medio\"\n    },\n    {\n      \"orden\": 3,\n      \"descripcion\": \"Cortar la carne en trozos pequeños\"\n    },\n    {\n      \"orden\": 4,\n      \"descripcion\": \"Servir en tortillas de maíz con piña, cilantro y cebolla\"\n    }\n  ],\n  \"tags\": [\"Mexicano\", \"Rápido\"]\n}"
+      },
+      "description": "Crea una receta de tacos al pastor"
+    },
+    {
+      "_id": "req_create_receta_2",
+      "_type": "request",
+      "parentId": "fld_recetas",
+      "name": "Crear Receta - Pozole Rojo",
+      "method": "POST",
+      "url": "{{ base_url }}/recetas",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"titulo\": \"Pozole Rojo\",\n  \"descripcion\": \"Platillo tradicional mexicano perfecto para ocasiones especiales\",\n  \"tiempoPreparacion\": 120,\n  \"creadorId\": {{ user_id }},\n  \"privacidad\": false,\n  \"pasos\": [\n    {\n      \"orden\": 1,\n      \"descripcion\": \"Cocinar el maíz cacahuazintle con agua y cal durante 2 horas\"\n    },\n    {\n      \"orden\": 2,\n      \"descripcion\": \"Cocer la carne de cerdo con ajo y cebolla\"\n    },\n    {\n      \"orden\": 3,\n      \"descripcion\": \"Preparar la salsa con chiles guajillo\"\n    },\n    {\n      \"orden\": 4,\n      \"descripcion\": \"Mezclar todo y servir con lechuga, rábano, orégano y tostadas\"\n    }\n  ],\n  \"tags\": [\"Mexicano\", \"Saludable\"]\n}"
+      },
+      "description": "Crea una receta de pozole rojo"
+    },
+    {
+      "_id": "req_create_receta_3",
+      "_type": "request",
+      "parentId": "fld_recetas",
+      "name": "Crear Receta - Ensalada César Vegana",
+      "method": "POST",
+      "url": "{{ base_url }}/recetas",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"titulo\": \"Ensalada César Vegana\",\n  \"descripcion\": \"Versión saludable y vegana de la clásica ensalada César\",\n  \"tiempoPreparacion\": 15,\n  \"creadorId\": {{ user_id }},\n  \"privacidad\": false,\n  \"pasos\": [\n    {\n      \"orden\": 1,\n      \"descripcion\": \"Lavar y cortar la lechuga romana\"\n    },\n    {\n      \"orden\": 2,\n      \"descripcion\": \"Preparar el aderezo con tahini, ajo, limón y levadura nutricional\"\n    },\n    {\n      \"orden\": 3,\n      \"descripcion\": \"Hacer crutones con pan integral\"\n    },\n    {\n      \"orden\": 4,\n      \"descripcion\": \"Mezclar todo y servir inmediatamente\"\n    }\n  ],\n  \"tags\": [\"Vegano\", \"Rápido\", \"Saludable\"]\n}"
+      },
+      "description": "Crea una receta vegana rápida"
+    },
+    {
+      "_id": "req_delete_receta",
+      "_type": "request",
+      "parentId": "fld_recetas",
+      "name": "Eliminar Receta",
+      "method": "DELETE",
+      "url": "{{ base_url }}/recetas/1",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "description": "Elimina una receta por su ID"
+    },
+    {
+      "_id": "fld_lugares",
+      "_type": "request_group",
+      "name": "Lugares",
+      "description": "Endpoints de lugares"
+    },
+    {
+      "_id": "req_get_lugares",
+      "_type": "request",
+      "parentId": "fld_lugares",
+      "name": "Obtener Todos los Lugares",
+      "method": "GET",
+      "url": "{{ base_url }}/lugares",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "description": "Obtiene todos los lugares registrados"
+    },
+    {
+      "_id": "req_get_lugar_by_id",
+      "_type": "request",
+      "parentId": "fld_lugares",
+      "name": "Obtener Lugar por ID",
+      "method": "GET",
+      "url": "{{ base_url }}/lugares/1",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "description": "Obtiene un lugar específico por su ID"
+    },
+    {
+      "_id": "req_create_lugar",
+      "_type": "request",
+      "parentId": "fld_lugares",
+      "name": "Crear Lugar",
+      "method": "POST",
+      "url": "{{ base_url }}/lugares",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"nombre\": \"Restaurante El Buen Sabor\",\n  \"direccion\": \"Calle Principal 123, Ciudad\",\n  \"ciudad\": \"Ciudad de México\",\n  \"pais\": \"México\",\n  \"descripcion\": \"Restaurante familiar con comida tradicional mexicana\",\n  \"creadorId\": {{ user_id }}\n}"
+      },
+      "description": "Crea un nuevo lugar"
+    },
+    {
+      "_id": "fld_comentarios",
+      "_type": "request_group",
+      "name": "Comentarios",
+      "description": "Endpoints de comentarios"
+    },
+    {
+      "_id": "req_get_comentarios",
+      "_type": "request",
+      "parentId": "fld_comentarios",
+      "name": "Obtener Comentarios de un Objeto",
+      "method": "GET",
+      "url": "{{ base_url }}/comentarios/1/1",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "description": "Obtiene comentarios de un objeto específico (objetoId/tipoId)"
+    },
+    {
+      "_id": "req_create_comentario",
+      "_type": "request",
+      "parentId": "fld_comentarios",
+      "name": "Crear Comentario",
+      "method": "POST",
+      "url": "{{ base_url }}/comentarios",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"contenido\": \"¡Excelente receta! La preparé y quedó deliciosa.\",\n  \"calificacion\": 5,\n  \"autorId\": {{ user_id }},\n  \"objetoId\": 1,\n  \"tipoObjeto\": \"Receta\"\n}"
+      },
+      "description": "Crea un nuevo comentario en un objeto"
+    },
+    {
+      "_id": "fld_admin",
+      "_type": "request_group",
+      "name": "Admin",
+      "description": "Endpoints administrativos"
+    },
+    {
+      "_id": "req_get_tipos",
+      "_type": "request",
+      "parentId": "fld_admin",
+      "name": "Obtener Todos los Tipos",
+      "method": "GET",
+      "url": "{{ base_url }}/admin/tipos",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "description": "Obtiene todos los tipos de recomendación"
+    },
+    {
+      "_id": "req_create_tipo",
+      "_type": "request",
+      "parentId": "fld_admin",
+      "name": "Crear Tipo",
+      "method": "POST",
+      "url": "{{ base_url }}/admin/tipos/Video",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "description": "Crea un nuevo tipo de recomendación"
+    },
+    {
+      "_id": "req_get_objetos",
+      "_type": "request",
+      "parentId": "fld_admin",
+      "name": "Obtener Todos los Objetos",
+      "method": "GET",
+      "url": "{{ base_url }}/admin/objetos",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "description": "Obtiene todos los objetos comentables"
+    },
+    {
+      "_id": "req_create_objeto",
+      "_type": "request",
+      "parentId": "fld_admin",
+      "name": "Crear Objeto",
+      "method": "POST",
+      "url": "{{ base_url }}/admin/objetos/Blog",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "description": "Crea un nuevo tipo de objeto comentable"
+    },
+    {
+      "_id": "req_comentarios_pendientes",
+      "_type": "request",
+      "parentId": "fld_admin",
+      "name": "Comentarios Pendientes de Moderación",
+      "method": "GET",
+      "url": "{{ base_url }}/admin/moderacion/pendientes",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "description": "Obtiene comentarios que requieren moderación"
+    },
+    {
+      "_id": "req_moderar_comentario",
+      "_type": "request",
+      "parentId": "fld_admin",
+      "name": "Moderar Comentario",
+      "method": "POST",
+      "url": "{{ base_url }}/admin/moderacion/1/estado?moderado=true",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "description": "Aprueba o rechaza un comentario (moderado=true para aprobar)"
+    }
+  ]
+}
+
