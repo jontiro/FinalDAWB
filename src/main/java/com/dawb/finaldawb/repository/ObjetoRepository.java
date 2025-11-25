@@ -18,7 +18,6 @@ public class ObjetoRepository {
     public Objeto save(Objeto objeto) {
         if (objeto.getId() == null) {
             em.persist(objeto);
-            em.flush(); // Forzar sincronización para obtener el ID generado
             return objeto;
         } else {
             return em.merge(objeto);

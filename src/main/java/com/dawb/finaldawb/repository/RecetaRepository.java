@@ -20,7 +20,6 @@ public class RecetaRepository {
     public Receta save(Receta receta) {
         if (receta.getId() == null) {
             em.persist(receta);
-            em.flush(); // Forzar sincronización para obtener el ID generado
             return receta;
         } else {
             return em.merge(receta);

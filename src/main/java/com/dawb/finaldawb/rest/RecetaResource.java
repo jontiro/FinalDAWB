@@ -63,7 +63,8 @@ public class RecetaResource {
         Receta savedReceta = recetaService.createReceta(
                 nuevaReceta,
                 pasosEntities,
-                request.getTags()
+                request.getTags(),
+                request.getTagIds()  // Pasar también los IDs de tags
         );
 
         // 5. Éxito: Devolver 201 CREATED con el DTO de respuesta seguro

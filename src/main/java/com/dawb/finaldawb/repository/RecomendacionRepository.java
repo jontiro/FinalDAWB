@@ -21,7 +21,6 @@ public class RecomendacionRepository {
     public Recomendacion save(Recomendacion recomendacion) {
         if (recomendacion.getId() == null) {
             em.persist(recomendacion);
-            em.flush(); // Forzar sincronización para obtener el ID generado
             return recomendacion;
         } else {
             return em.merge(recomendacion);

@@ -18,7 +18,6 @@ public class TipoRepository {
     public Tipo save(Tipo tipo) {
         if (tipo.getId() == null) {
             em.persist(tipo);
-            em.flush(); // Forzar sincronización para obtener el ID generado
             return tipo;
         } else {
             return em.merge(tipo);

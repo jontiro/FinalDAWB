@@ -19,11 +19,10 @@ public class LugarRepository {
 
     public Lugar save(Lugar lugar) {
         if (lugar.getId() == null) {
-            em.persist(lugar); // INSERT
-            em.flush(); // Forzar sincronización con BD para obtener el ID generado
+            em.persist(lugar);
             return lugar;
         } else {
-            return em.merge(lugar); // UPDATE
+            return em.merge(lugar);
         }
     }
 

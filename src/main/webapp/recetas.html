@@ -145,7 +145,7 @@
         function showCreateModal() {
             if (!Auth.isLoggedIn()) {
                 Utils.showToast('Debes iniciar sesión', 'Regístrate o inicia sesión para crear recetas', 'info');
-                Auth.showModal('login');
+                openAuthModal('login');
                 return;
             }
 

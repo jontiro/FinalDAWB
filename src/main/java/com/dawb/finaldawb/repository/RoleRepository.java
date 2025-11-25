@@ -38,7 +38,6 @@ public class RoleRepository {
             if (!tx.isActive()) tx.begin();
             if (role.getId() == null) {
                 em.persist(role); // INSERT
-                em.flush(); // Forzar sincronización para obtener el ID generado
             } else {
                 role = em.merge(role); // UPDATE
             }

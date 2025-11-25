@@ -17,7 +17,6 @@ public class TagRepository {
     public Tag save(Tag tag) {
         if (tag.getId() == null) {
             em.persist(tag);
-            em.flush(); // Forzar sincronización para obtener el ID generado
             return tag;
         } else {
             return em.merge(tag);

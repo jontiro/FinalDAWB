@@ -12,13 +12,12 @@ public class RecetaPasoRepository {
     @Inject
     private EntityManager em;
 
-    public RecetaPaso save(RecetaPaso recetaPaso) {
-        if (recetaPaso.getId() == null) {
-            em.persist(recetaPaso);
-            em.flush(); // Forzar sincronización para obtener el ID generado
-            return recetaPaso;
+    public RecetaPaso save(RecetaPaso paso) {
+        if (paso.getId() == null) {
+            em.persist(paso);
+            return paso;
         } else {
-            return em.merge(recetaPaso);
+            return em.merge(paso);
         }
     }
 

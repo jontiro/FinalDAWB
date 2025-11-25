@@ -32,8 +32,11 @@ public class RecetaRequest {
     @Valid
     private List<PasoRequest> pasos;
 
-    // Lista de nombres de tags
+    // Lista de nombres de tags (opción 1 - para crear nuevos o buscar existentes)
     private List<String> tags;
+
+    // Lista de IDs de tags (opción 2 - más eficiente, usar tags existentes)
+    private List<Long> tagIds;
 
     // Constructores, Getters y Setters
     public RecetaRequest() {}
@@ -92,5 +95,13 @@ public class RecetaRequest {
 
     public void setTags(List<String> tags) {
         this.tags = tags;
+    }
+
+    public List<Long> getTagIds() {
+        return tagIds;
+    }
+
+    public void setTagIds(List<Long> tagIds) {
+        this.tagIds = tagIds;
     }
 }

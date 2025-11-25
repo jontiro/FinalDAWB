@@ -21,10 +21,8 @@ public class ComentarioResponse {
         response.texto = comentario.getContenido();
         response.fechaCreacion = comentario.getFechaCreacion();
 
-        // Asumiendo que las relaciones están cargadas:
-        if (comentario.getObjeto() != null) {
-            response.recetaId = comentario.getObjeto().getId();
-        }
+        // Usar entidadId en lugar de objeto.id
+        response.recetaId = comentario.getEntidadId();
 
         if (comentario.getAutor() != null) {
             response.autorId = comentario.getAutor().getId();

@@ -14,10 +14,8 @@ public class RecetaTagRepository {
     private EntityManager em;
 
     public RecetaTag save(RecetaTag recetaTag) {
-        if (recetaTag.getId() == null || recetaTag.getId().getRecetaId() == null) {
-            // Para entidades con claves compuestas, usamos persist directamente
+        if (recetaTag.getId() == null) {
             em.persist(recetaTag);
-            em.flush(); // Forzar sincronización para obtener el ID generado
             return recetaTag;
         } else {
             return em.merge(recetaTag);

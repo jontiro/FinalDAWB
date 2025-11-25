@@ -1,6 +1,7 @@
 package com.dawb.finaldawb.config;
 
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.context.RequestScoped;
 import jakarta.enterprise.inject.Disposes;
 import jakarta.enterprise.inject.Produces;
 import jakarta.persistence.EntityManager;
@@ -17,6 +18,7 @@ public class EntityManagerProducer {
     }
 
     @Produces
+    @RequestScoped  // Cambiado a RequestScoped para compartir el mismo EM en una petición
     public EntityManager produceEntityManager(EntityManagerFactory emf) {
         return emf.createEntityManager();
     }

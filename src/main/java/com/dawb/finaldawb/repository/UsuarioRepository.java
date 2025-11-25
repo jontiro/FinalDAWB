@@ -25,7 +25,6 @@ public class UsuarioRepository {
             if (!tx.isActive()) tx.begin();
             if (usuario.getId() == null) {
                 em.persist(usuario); // INSERT
-                em.flush(); // Forzar sincronización para obtener el ID generado
             } else {
                 usuario = em.merge(usuario); // UPDATE
             }

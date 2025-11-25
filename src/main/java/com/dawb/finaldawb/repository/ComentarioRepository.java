@@ -21,7 +21,6 @@ public class ComentarioRepository {
     public Comentario save(Comentario comentario) {
         if (comentario.getId() == null) {
             em.persist(comentario);
-            em.flush(); // Forzar sincronización para obtener el ID generado
             return comentario;
         } else {
             return em.merge(comentario);
@@ -62,6 +61,16 @@ public class ComentarioRepository {
      */
     public List<Comentario> findPendientesModeracion() {
         return em.createQuery("SELECT c FROM Comentario c WHERE c.moderado = false ORDER BY c.fechaCreacion ASC", Comentario.class)
+                .getResultList();
+    }
+
+    /**
+     * Busca comentarios por entidad_id y objeto_id (para buscar comentarios de una receta específica).
+     */
+    public List<Comentario> findByEntidadIdAndObjeto(Long entidadId, Objeto objeto) {
+        return em.createQuery("SELECT c FROM Comentario c WHERE c.entidadId = :entidadId AND c.objeto = :objeto ORDER BY c.fechaCreacion DESC", Comentario.class)
+                .setParameter("entidadId", entidadId)
+                .setParameter("objeto", objeto)
                 .getResultList();
     }
 }

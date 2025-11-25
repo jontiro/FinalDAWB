@@ -33,41 +33,30 @@ public class ComentarioResource {
 
     /**
      * POST /comentarios : Crea un nuevo comentario.
-     * * NOTA: Asume que RecetaId en el DTO es el ID del Objeto genérico a comentar.
-     * * @param request Datos del comentario (texto, idEntidad, tipoEntidad, usuarioId).
-     * @return 201 CREATED o 404 NOT FOUND.
+     * @param request Datos del comentario (texto, recetaId, usuarioId).
+     * @return 201 CREATED o 400 BAD REQUEST.
      */
     @POST
     public Response createComentario(@Valid ComentarioRequest request) {
+        try {
+            Comentario savedComentario = comentarioService.createComentarioReceta(
+                    request.getTexto(),
+                    request.getUsuarioId(),
+                    request.getRecetaId()
+            );
 
-        // 1. Validar existencia de Autor
-        if (usuarioService.findById(request.getUsuarioId()).isEmpty()) {
-            return Response.status(Response.Status.NOT_FOUND)
-                    .entity("Usuario no encontrado.")
+            return Response.status(Response.Status.CREATED)
+                    .entity(ComentarioResponse.fromEntity(savedComentario))
+                    .build();
+        } catch (IllegalArgumentException e) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity(e.getMessage())
+                    .build();
+        } catch (IllegalStateException e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity(e.getMessage())
                     .build();
         }
-
-        Comentario nuevoComentario = new Comentario();
-        nuevoComentario.setContenido(request.getTexto());
-
-        // CORRECCIÓN: Se pasa el RecetaId del DTO como el ID del Objeto a comentar.
-        Comentario savedComentario = comentarioService.createComentario(
-                nuevoComentario,
-                request.getUsuarioId(),
-                request.getRecetaId(), // <--- ID del Objeto (Receta)
-                "Receta" // Tipo de objeto fijo (simplificación)
-        ).orElse(null);
-
-        if (savedComentario == null) {
-            return Response.status(Response.Status.NOT_FOUND)
-                    .entity("Error al crear comentario: la receta o el tipo Objeto no existe.")
-                    .build();
-        }
-
-        // 4. Éxito: Devolver 201 CREATED
-        return Response.status(Response.Status.CREATED)
-                .entity(ComentarioResponse.fromEntity(savedComentario))
-                .build();
     }
 
     /**
@@ -86,14 +75,13 @@ public class ComentarioResource {
 
     /**
      * GET /comentarios/receta/{recetaId} : Obtiene todos los comentarios de una receta.
-     * * @param recetaId ID de la receta (objeto).
+     * @param recetaId ID de la receta.
      * @return Lista de comentarios.
      */
     @GET
     @Path("/receta/{recetaId}")
     public List<ComentarioResponse> findAllByRecetaId(@PathParam("recetaId") Long recetaId) {
-        // En el servicio, findAllByObjetoId asume que el recetaId pasado es el objetoId.
-        return comentarioService.findAllByObjetoId(recetaId)
+        return comentarioService.findByRecetaId(recetaId)
                 .stream()
                 .map(ComentarioResponse::fromEntity)
                 .collect(Collectors.toList());

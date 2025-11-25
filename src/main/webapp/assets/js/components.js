@@ -72,7 +72,7 @@ const Components = {
         modal.innerHTML = `
             <div class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" id="auth-modal">
                 <div class="bg-white rounded-2xl max-w-md w-full p-8 relative">
-                    <button onclick="Auth.closeModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+                    <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
                         <i class="fas fa-times text-2xl"></i>
                     </button>
                     
@@ -96,7 +96,7 @@ const Components = {
                         </form>
                         <p class="mt-4 text-center text-gray-600">
                             ¿No tienes cuenta? 
-                            <button onclick="Auth.showModal('register')" class="text-purple-600 font-semibold hover:underline">
+                            <button onclick="openAuthModal('register')" class="text-purple-600 font-semibold hover:underline">
                                 Regístrate
                             </button>
                         </p>
@@ -139,7 +139,7 @@ const Components = {
                         </form>
                         <p class="mt-4 text-center text-gray-600">
                             ¿Ya tienes cuenta? 
-                            <button onclick="Auth.showModal('login')" class="text-purple-600 font-semibold hover:underline">
+                            <button onclick="openAuthModal('login')" class="text-purple-600 font-semibold hover:underline">
                                 Inicia sesión
                             </button>
                         </p>

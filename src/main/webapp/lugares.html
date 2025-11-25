@@ -140,7 +140,7 @@
         function showCreateModal() {
             if (!Auth.isLoggedIn()) {
                 Utils.showToast('Debes iniciar sesión', 'Regístrate o inicia sesión para recomendar lugares', 'info');
-                Auth.showModal('login');
+                openAuthModal('login');
                 return;
             }
 

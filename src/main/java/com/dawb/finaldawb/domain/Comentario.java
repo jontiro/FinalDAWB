@@ -27,6 +27,10 @@ public class Comentario {
     @JoinColumn(name = "objeto_id", nullable = true)
     private Objeto objeto;
 
+    // ID de la entidad específica comentada (Receta, Lugar, etc.)
+    @Column(name = "entidad_id")
+    private Long entidadId;
+
     // Moderación (tinyint(1) NOT NULL DEFAULT 0)
     @Column(nullable = false)
     private boolean moderado = false;
@@ -81,6 +85,14 @@ public class Comentario {
 
     public void setObjeto(Objeto objeto) {
         this.objeto = objeto;
+    }
+
+    public Long getEntidadId() {
+        return entidadId;
+    }
+
+    public void setEntidadId(Long entidadId) {
+        this.entidadId = entidadId;
     }
 
     public boolean isModerado() {
