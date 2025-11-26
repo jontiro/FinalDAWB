@@ -114,33 +114,142 @@
         </div>
     </div>
 
+    "usuarioId": {{ user_id }},
+    "texto": "Delicioso",
+    "recetaId": 9    <!-- Modal Ver Lugar -->
+    <div id="ver-lugar-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-2xl w-full p-8 relative max-h-[90vh] overflow-y-auto">
+            <button onclick="closeVerLugarModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+                <i class="fas fa-times text-2xl"></i>
+            </button>
+
+            <div id="lugar-detalle-content">
+                <!-- El contenido se cargará dinámicamente -->
+            </div>
+        </div>
+    </div>
+
     <!-- Footer -->
     <div id="footer"></div>
 
-    <!-- Modals -->
-    <div id="auth-modal"></div>
-    <div id="toast"></div>
+    <!-- Modal de Login -->
+    <div id="login-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-8 relative">
+            <button onclick="closeLoginModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+                <i class="fas fa-times text-2xl"></i>
+            </button>
+            <h3 class="text-3xl font-bold text-gray-900 mb-6">Iniciar Sesión</h3>
+            <form id="login-form" class="space-y-4">
+                <div>
+                    <label class="block text-gray-700 mb-2 font-medium">Usuario o Email</label>
+                    <input type="text" id="login-username" required
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
+                </div>
+                <div>
+                    <label class="block text-gray-700 mb-2 font-medium">Contraseña</label>
+                    <input type="password" id="login-password" required
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
+                </div>
+                <button type="submit"
+                        class="w-full py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg font-semibold hover:from-purple-700 hover:to-indigo-700 transition">
+                    Iniciar Sesión
+                </button>
+            </form>
+            <p class="mt-4 text-center text-gray-600">
+                ¿No tienes cuenta?
+                <button onclick="switchToRegister()" class="text-purple-600 font-semibold hover:underline">
+                    Regístrate
+                </button>
+            </p>
+        </div>
+    </div>
 
-    <script src="assets/js/auth.js"></script>
+    <!-- Modal de Registro -->
+    <div id="register-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-8 relative max-h-[90vh] overflow-y-auto">
+            <button onclick="closeRegisterModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+                <i class="fas fa-times text-2xl"></i>
+            </button>
+            <h3 class="text-3xl font-bold text-gray-900 mb-6">Crear Cuenta</h3>
+            <form id="register-form" class="space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-gray-700 mb-2 font-medium">Nombre</label>
+                        <input type="text" id="register-nombre"
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 mb-2 font-medium">Apellido</label>
+                        <input type="text" id="register-apellido"
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-gray-700 mb-2 font-medium">Usuario *</label>
+                    <input type="text" id="register-username" required
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
+                </div>
+                <div>
+                    <label class="block text-gray-700 mb-2 font-medium">Email *</label>
+                    <input type="email" id="register-email" required
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
+                </div>
+                <div>
+                    <label class="block text-gray-700 mb-2 font-medium">Contraseña *</label>
+                    <input type="password" id="register-password" required
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
+                </div>
+                <button type="submit"
+                        class="w-full py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg font-semibold hover:from-purple-700 hover:to-indigo-700 transition">
+                    Crear Cuenta
+                </button>
+            </form>
+            <p class="mt-4 text-center text-gray-600">
+                ¿Ya tienes cuenta?
+                <button onclick="switchToLogin()" class="text-purple-600 font-semibold hover:underline">
+                    Inicia sesión
+                </button>
+            </p>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="hidden fixed bottom-4 right-4 bg-white shadow-2xl rounded-lg p-4 max-w-sm z-50">
+        <div class="flex items-center">
+            <div id="toast-icon" class="mr-3"></div>
+            <div>
+                <p id="toast-message" class="font-semibold text-gray-900"></p>
+                <p id="toast-detail" class="text-sm text-gray-600"></p>
+            </div>
+        </div>
+    </div>
+
     <script src="assets/js/components.js"></script>
+    <script src="assets/js/auth-modal.js"></script>
     <script>
         Components.loadFooter();
-        Components.loadAuthModal();
-        Components.loadToast();
 
         let currentLugarId = null;
 
+        // Verificar si el usuario es admin
+        function isAdmin() {
+            const user = getUser();
+            return user && user.role === 'ADMIN';
+        }
+
         function checkAuthForCreate() {
             const btnCrear = document.getElementById('btn-crear-lugar');
-            if (!Auth.isLoggedIn()) {
+            const user = getUser();
+            if (!user) {
                 btnCrear.classList.add('hidden');
             }
         }
 
         function showCreateModal() {
-            if (!Auth.isLoggedIn()) {
-                Utils.showToast('Debes iniciar sesión', 'Regístrate o inicia sesión para recomendar lugares', 'info');
-                openAuthModal('login');
+            const user = getUser();
+            if (!user) {
+                showToast('Debes iniciar sesión', 'Regístrate o inicia sesión para recomendar lugares', 'info');
+                openLoginModal();
                 return;
             }
 
@@ -153,6 +262,85 @@
 
         function closeLugarModal() {
             document.getElementById('lugar-modal').classList.add('hidden');
+        }
+
+        // Ver detalles de lugar
+        async function verLugar(id) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/lugares/${id}`);
+                const lugar = await response.json();
+
+                if (response.ok) {
+                    const user = getUser();
+                    const canEdit = user && (lugar.autorId === user.id || isAdmin());
+
+                    const content = `
+                        <div class="mb-6">
+                            <div class="flex items-start justify-between mb-4">
+                                <div>
+                                    <h3 class="text-3xl font-bold text-gray-900 mb-2">
+                                        <i class="fas fa-map-marker-alt text-pink-600 mr-2"></i>
+                                        ${lugar.nombre}
+                                    </h3>
+                                </div>
+                            </div>
+
+                            <div class="space-y-3 mb-4">
+                                <div class="flex items-start">
+                                    <i class="fas fa-map-pin text-pink-600 mr-3 mt-1 text-lg"></i>
+                                    <div>
+                                        <p class="text-gray-700 font-medium">Dirección</p>
+                                        <p class="text-gray-600">${lugar.direccion}</p>
+                                    </div>
+                                </div>
+
+                                ${lugar.ciudad ? `
+                                    <div class="flex items-start">
+                                        <i class="fas fa-city text-pink-600 mr-3 mt-1 text-lg"></i>
+                                        <div>
+                                            <p class="text-gray-700 font-medium">Ciudad</p>
+                                            <p class="text-gray-600">${lugar.ciudad}${lugar.pais ? ', ' + lugar.pais : ''}</p>
+                                        </div>
+                                    </div>
+                                ` : ''}
+
+                                <div class="flex items-start">
+                                    <i class="far fa-user text-pink-600 mr-3 mt-1 text-lg"></i>
+                                    <div>
+                                        <p class="text-gray-700 font-medium">Recomendado por</p>
+                                        <p class="text-gray-600">${lugar.autorUsername || 'Anónimo'}</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            ${canEdit ? `
+                                <div class="flex space-x-3 pt-4 border-t">
+                                    <button onclick="closeVerLugarModal(); editLugar(${lugar.id})"
+                                            class="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-semibold">
+                                        <i class="fas fa-edit mr-2"></i> Editar Lugar
+                                    </button>
+                                    <button onclick="closeVerLugarModal(); deleteLugar(${lugar.id})"
+                                            class="flex-1 px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition font-semibold">
+                                        <i class="fas fa-trash mr-2"></i> Eliminar
+                                    </button>
+                                </div>
+                            ` : ''}
+                        </div>
+                    `;
+
+                    document.getElementById('lugar-detalle-content').innerHTML = content;
+                    document.getElementById('ver-lugar-modal').classList.remove('hidden');
+                } else {
+                    showToast('Error', 'No se pudo cargar el lugar', 'error');
+                }
+            } catch (error) {
+                console.error('Error al cargar lugar:', error);
+                showToast('Error', 'No se pudo cargar el lugar', 'error');
+            }
+        }
+
+        function closeVerLugarModal() {
+            document.getElementById('ver-lugar-modal').classList.add('hidden');
         }
 
         async function loadLugares() {
@@ -174,12 +362,13 @@
                     return;
                 }
 
-                const user = Auth.getUser();
+                const user = getUser();
 
                 grid.innerHTML = lugares.map(lugar => {
-                    const canEdit = user && lugar.autorId === user.id;
+                    const canEdit = user && (lugar.autorId === user.id || isAdmin());
                     return `
-                        <div class="lugar-card bg-white rounded-2xl shadow-lg overflow-hidden">
+                        <div class="lugar-card bg-white rounded-2xl shadow-lg overflow-hidden cursor-pointer hover:shadow-2xl transition-shadow duration-300"
+                             onclick="verLugar(${lugar.id})">
                             <div class="h-40 bg-gradient-to-br from-pink-400 to-purple-500 flex items-center justify-center">
                                 <i class="fas fa-map-marker-alt text-white text-5xl"></i>
                             </div>
@@ -199,10 +388,12 @@
                                 </p>
                                 ${canEdit ? `
                                     <div class="flex space-x-2">
-                                        <button onclick="editLugar(${lugar.id})" class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+                                        <button onclick="event.stopPropagation(); editLugar(${lugar.id})"
+                                                class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
                                             <i class="fas fa-edit mr-1"></i> Editar
                                         </button>
-                                        <button onclick="deleteLugar(${lugar.id})" class="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition">
+                                        <button onclick="event.stopPropagation(); deleteLugar(${lugar.id})"
+                                                class="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition">
                                             <i class="fas fa-trash mr-1"></i> Eliminar
                                         </button>
                                     </div>
@@ -212,22 +403,31 @@
                     `;
                 }).join('');
 
-                Utils.showToast('Lugares cargados', `${lugares.length} lugar(es) encontrado(s)`);
+                showToast('Lugares cargados', `${lugares.length} lugar(es) encontrado(s)`);
             } catch (error) {
                 grid.innerHTML = '<div class="col-span-3 text-center py-12"><p class="text-red-600">Error al cargar lugares</p></div>';
-                Utils.showToast('Error', 'No se pudieron cargar los lugares', 'error');
+                showToast('Error', 'No se pudieron cargar los lugares', 'error');
             }
         }
 
         document.getElementById('lugar-form').addEventListener('submit', async (e) => {
             e.preventDefault();
 
+            const user = getUser();
+            if (!user) {
+                showToast('Error', 'Debes iniciar sesión', 'error');
+                return;
+            }
+
             const payload = {
                 nombre: document.getElementById('lugar-nombre').value,
                 direccion: document.getElementById('lugar-direccion').value,
                 ciudad: document.getElementById('lugar-ciudad').value || undefined,
-                pais: document.getElementById('lugar-pais').value || undefined
+                pais: document.getElementById('lugar-pais').value || undefined,
+                autorId: user.id
             };
+
+            console.log('Payload a enviar:', JSON.stringify(payload, null, 2));
 
             try {
                 const url = currentLugarId
@@ -244,14 +444,15 @@
                 const data = await response.json();
 
                 if (response.ok) {
-                    Utils.showToast('¡Éxito!', `Lugar ${currentLugarId ? 'actualizado' : 'creado'} correctamente`, 'success');
+                    showToast('¡Éxito!', `Lugar ${currentLugarId ? 'actualizado' : 'creado'} correctamente`, 'success');
                     closeLugarModal();
                     loadLugares();
                 } else {
-                    Utils.showToast('Error', data.error || data.message || 'Error al guardar', 'error');
+                    showToast('Error', data.error || data.message || 'Error al guardar', 'error');
                 }
             } catch (error) {
-                Utils.showToast('Error', 'No se pudo guardar el lugar', 'error');
+                console.error('Error al guardar lugar:', error);
+                showToast('Error', 'No se pudo guardar el lugar', 'error');
             }
         });
 
@@ -271,7 +472,7 @@
                     document.getElementById('lugar-modal').classList.remove('hidden');
                 }
             } catch (error) {
-                Utils.showToast('Error', 'No se pudo cargar el lugar', 'error');
+                showToast('Error', 'No se pudo cargar el lugar', 'error');
             }
         }
 
@@ -284,13 +485,13 @@
                 });
 
                 if (response.ok) {
-                    Utils.showToast('Eliminado', 'Lugar eliminado correctamente', 'success');
+                    showToast('Eliminado', 'Lugar eliminado correctamente', 'success');
                     loadLugares();
                 } else {
-                    Utils.showToast('Error', 'No se pudo eliminar el lugar', 'error');
+                    showToast('Error', 'No se pudo eliminar el lugar', 'error');
                 }
             } catch (error) {
-                Utils.showToast('Error', 'No se pudo eliminar el lugar', 'error');
+                showToast('Error', 'No se pudo eliminar el lugar', 'error');
             }
         }
 

@@ -27,13 +27,14 @@ VALUES
     ('Postre', 'Recetas de postres y dulces', NOW(), NOW()),
     ('Mexicano', 'Recetas de comida mexicana', NOW(), NOW());
 
--- Verificar que todo se insertó correctamente
-SELECT 'Roles insertados:' AS info;
-SELECT * FROM roles;
+-- 5. Insertar tipos de objetos (para el sistema de comentarios polimórfico)
+INSERT IGNORE INTO objeto (id, descripcion, creado_en, actualizado_en)
+VALUES
+    (1, 'Receta', NOW(), NOW()),
+    (2, 'Lugar', NOW(), NOW());
 
-SELECT 'Usuarios de prueba:' AS info;
-SELECT id, username, email, role_id, estado FROM usuarios;
-
-SELECT 'Tags disponibles:' AS info;
-SELECT * FROM tags;
+-- 6. Crear una receta de prueba
+INSERT IGNORE INTO receta (id, titulo, descripcion, tiempo_preparacion, creador_id, fecha_creacion, fecha_actualizacion, privacidad)
+VALUES
+    (1, 'Tacos al Pastor', 'Deliciosos tacos mexicanos con carne de cerdo marinada', 45, 1, NOW(), NOW(), 0);
 

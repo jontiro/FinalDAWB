@@ -6,14 +6,16 @@ import com.dawb.finaldawb.repository.LugarRepository;
 import com.dawb.finaldawb.repository.UsuarioRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import jakarta.transaction.Transactional;
+import jakarta.persistence.EntityManager;
 
 import java.util.List;
 import java.util.Optional;
 
 @ApplicationScoped
-@Transactional
 public class LugarService {
+
+    @Inject
+    private EntityManager em;
 
     private LugarRepository lugarRepository;
     private UsuarioRepository usuarioRepository;
@@ -24,9 +26,10 @@ public class LugarService {
 
     // Inyección por constructor
     @Inject
-    public LugarService(LugarRepository lugarRepository, UsuarioRepository usuarioRepository) {
+    public LugarService(LugarRepository lugarRepository, UsuarioRepository usuarioRepository, EntityManager em) {
         this.lugarRepository = lugarRepository;
         this.usuarioRepository = usuarioRepository;
+        this.em = em;
     }
 
     /**
@@ -61,13 +64,28 @@ public class LugarService {
      * @return El lugar persistido o Optional.empty() si el autor no existe.
      */
     public Optional<Lugar> createLugar(Lugar lugar, Long autorId) {
-        return usuarioRepository.findById(autorId)
-                .map(autor -> {
-                    lugar.setAutor(autor);
-                    // El campo 'id' debe ser null para que save() haga persist (INSERT)
-                    lugar.setId(null);
-                    return lugarRepository.save(lugar);
-                });
+        em.getTransaction().begin();
+        try {
+            Optional<Usuario> autorOpt = usuarioRepository.findById(autorId);
+            if (autorOpt.isEmpty()) {
+                em.getTransaction().rollback();
+                return Optional.empty();
+            }
+
+            lugar.setAutor(autorOpt.get());
+            lugar.setId(null);
+
+            Lugar savedLugar = lugarRepository.save(lugar);
+            em.flush(); // Forzar generación del ID
+            em.getTransaction().commit();
+
+            return Optional.of(savedLugar);
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            throw e;
+        }
     }
 
     /**
@@ -77,18 +95,31 @@ public class LugarService {
      * @return El lugar actualizado o Optional.empty() si no existe o el autor no coincide.
      */
     public Optional<Lugar> updateLugar(Lugar lugar, Long autorId) {
-        // 1. Verificar si el lugar existe
-        return lugarRepository.findById(lugar.getId())
-                .filter(existingLugar -> existingLugar.getAutor().getId().equals(autorId)) // 2. Verificar que el autor es el mismo
-                .map(existingLugar -> {
-                    // 3. Aplicar solo los campos editables
-                    existingLugar.setNombre(lugar.getNombre());
-                    existingLugar.setDireccion(lugar.getDireccion());
-                    existingLugar.setCiudad(lugar.getCiudad());
-                    existingLugar.setPais(lugar.getPais());
-                    // 4. Guardar (merge)
-                    return lugarRepository.save(existingLugar);
-                });
+        em.getTransaction().begin();
+        try {
+            Optional<Lugar> existingLugarOpt = lugarRepository.findById(lugar.getId());
+
+            if (existingLugarOpt.isEmpty() || !existingLugarOpt.get().getAutor().getId().equals(autorId)) {
+                em.getTransaction().rollback();
+                return Optional.empty();
+            }
+
+            Lugar existingLugar = existingLugarOpt.get();
+            existingLugar.setNombre(lugar.getNombre());
+            existingLugar.setDireccion(lugar.getDireccion());
+            existingLugar.setCiudad(lugar.getCiudad());
+            existingLugar.setPais(lugar.getPais());
+
+            Lugar updatedLugar = lugarRepository.save(existingLugar);
+            em.getTransaction().commit();
+
+            return Optional.of(updatedLugar);
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            throw e;
+        }
     }
 
     /**
@@ -98,12 +129,23 @@ public class LugarService {
      * @return true si fue eliminado.
      */
     public boolean deleteLugar(Long id, Long autorId) {
-        return lugarRepository.findById(id)
-                .filter(lugar -> lugar.getAutor().getId().equals(autorId))
-                .map(lugar -> {
-                    lugarRepository.delete(lugar);
-                    return true;
-                })
-                .orElse(false);
+        em.getTransaction().begin();
+        try {
+            Optional<Lugar> lugarOpt = lugarRepository.findById(id);
+
+            if (lugarOpt.isEmpty() || !lugarOpt.get().getAutor().getId().equals(autorId)) {
+                em.getTransaction().rollback();
+                return false;
+            }
+
+            lugarRepository.delete(lugarOpt.get());
+            em.getTransaction().commit();
+            return true;
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            throw e;
+        }
     }
 }

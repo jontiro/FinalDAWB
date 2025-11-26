@@ -2,10 +2,11 @@ package com.dawb.finaldawb.rest;
 
 import com.dawb.finaldawb.domain.*;
 import com.dawb.finaldawb.rest.dto.ComentarioResponse;
-import com.dawb.finaldawb.service.ComentarioService;
-import com.dawb.finaldawb.service.TipoService;
-import com.dawb.finaldawb.service.ObjetoService;
-import com.dawb.finaldawb.service.UsuarioService;
+import com.dawb.finaldawb.rest.dto.UsuarioResponse;
+import com.dawb.finaldawb.rest.dto.UsuarioRequest;
+import com.dawb.finaldawb.rest.dto.RecetaResponse;
+import com.dawb.finaldawb.rest.dto.LugarResponse;
+import com.dawb.finaldawb.service.*;
 import com.dawb.finaldawb.repository.RoleRepository;
 
 import jakarta.inject.Inject;
@@ -17,8 +18,6 @@ import org.mindrot.jbcrypt.BCrypt;
 import java.util.List;
 import java.util.stream.Collectors;
 
-// Este recurso asume que el usuario tiene el rol 'ADMIN' o 'MODERADOR'
-// La verificación de roles debe hacerse con filtros de seguridad antes de llegar aquí (no implementado en JAX-RS base)
 @Path("/admin")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
@@ -28,20 +27,107 @@ public class AdminResource {
     private final TipoService tipoService;
     private final ObjetoService objetoService;
     private final UsuarioService usuarioService;
+    private final RecetaService recetaService;
+    private final LugarService lugarService;
     private final RoleRepository roleRepository;
 
     @Inject
     public AdminResource(ComentarioService comentarioService, TipoService tipoService,
                         ObjetoService objetoService, UsuarioService usuarioService,
+                        RecetaService recetaService, LugarService lugarService,
                         RoleRepository roleRepository) {
         this.comentarioService = comentarioService;
         this.tipoService = tipoService;
         this.objetoService = objetoService;
         this.usuarioService = usuarioService;
+        this.recetaService = recetaService;
+        this.lugarService = lugarService;
         this.roleRepository = roleRepository;
     }
 
-    // --- 1. MODERACIÓN DE COMENTARIOS ---
+    // ==================== USUARIOS ====================
+
+    @GET
+    @Path("/usuarios")
+    public List<UsuarioResponse> getAllUsuarios() {
+        return usuarioService.findAll().stream()
+                .map(UsuarioResponse::fromEntity)
+                .collect(Collectors.toList());
+    }
+
+    @POST
+    @Path("/usuarios")
+    public Response createUsuario(UsuarioRequest request) {
+        try {
+            Usuario usuario = new Usuario();
+            usuario.setUsername(request.getUsername());
+            usuario.setEmail(request.getEmail());
+            usuario.setPasswordHash(BCrypt.hashpw(request.getPassword(), BCrypt.gensalt()));
+            usuario.setEstado(EstadoUsuario.valueOf(request.getEstado()));
+
+            Role role = roleRepository.findById(request.getRoleId()).orElse(null);
+            if (role == null) {
+                return Response.status(Response.Status.BAD_REQUEST)
+                        .entity("{\"error\": \"Rol no encontrado\"}")
+                        .build();
+            }
+            usuario.setRole(role);
+
+            Usuario saved = usuarioService.save(usuario);
+            return Response.status(Response.Status.CREATED)
+                    .entity(UsuarioResponse.fromEntity(saved))
+                    .build();
+        } catch (Exception e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("{\"error\": \"" + e.getMessage() + "\"}")
+                    .build();
+        }
+    }
+
+    @PUT
+    @Path("/usuarios/{id}")
+    public Response updateUsuario(@PathParam("id") Long id, UsuarioRequest request) {
+        Usuario usuario = usuarioService.findById(id).orElse(null);
+        if (usuario == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+
+        usuario.setUsername(request.getUsername());
+        usuario.setEmail(request.getEmail());
+        if (request.getPassword() != null && !request.getPassword().isEmpty()) {
+            usuario.setPasswordHash(BCrypt.hashpw(request.getPassword(), BCrypt.gensalt()));
+        }
+        usuario.setEstado(EstadoUsuario.valueOf(request.getEstado()));
+
+        Role role = roleRepository.findById(request.getRoleId()).orElse(null);
+        if (role != null) {
+            usuario.setRole(role);
+        }
+
+        Usuario updated = usuarioService.update(usuario);
+        return Response.ok(UsuarioResponse.fromEntity(updated)).build();
+    }
+
+    @DELETE
+    @Path("/usuarios/{id}")
+    public Response deleteUsuario(@PathParam("id") Long id) {
+        if (usuarioService.delete(id)) {
+            return Response.noContent().build();
+        }
+        return Response.status(Response.Status.NOT_FOUND).build();
+    }
+
+    // ==================== COMENTARIOS ====================
+
+    @GET
+    @Path("/comentarios/todos")
+    public List<ComentarioResponse> getAllComentarios() {
+        // Este endpoint debería retornar TODOS los comentarios, no solo pendientes
+        return usuarioService.findAll().stream()
+                .flatMap(u -> comentarioService.findByAutorId(u.getId()).stream())
+                .map(ComentarioResponse::fromEntity)
+                .collect(Collectors.toList());
+    }
 
     /**
      * GET /admin/moderacion/pendientes : Obtiene comentarios no moderados.

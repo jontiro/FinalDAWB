@@ -31,6 +31,14 @@ public class ComentarioRepository {
         return Optional.ofNullable(em.find(Comentario.class, id));
     }
 
+    /**
+     * Obtiene todos los comentarios ordenados por fecha de creación descendente.
+     */
+    public List<Comentario> findAll() {
+        return em.createQuery("SELECT c FROM Comentario c ORDER BY c.fechaCreacion DESC", Comentario.class)
+                .getResultList();
+    }
+
     // Metodo de eliminación, necesario para ComentarioService
     public void delete(Comentario comentario) {
         em.remove(em.contains(comentario) ? comentario : em.merge(comentario));

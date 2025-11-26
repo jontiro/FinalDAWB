@@ -4,14 +4,16 @@ import com.dawb.finaldawb.domain.Tipo;
 import com.dawb.finaldawb.repository.TipoRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import jakarta.transaction.Transactional;
+import jakarta.persistence.EntityManager;
 
 import java.util.List;
 import java.util.Optional;
 
 @ApplicationScoped
-@Transactional
 public class TipoService {
+
+    @Inject
+    private EntityManager em;
 
     private TipoRepository tipoRepository;
 
@@ -21,8 +23,9 @@ public class TipoService {
 
     // Inyección por constructor
     @Inject
-    public TipoService(TipoRepository tipoRepository) {
+    public TipoService(TipoRepository tipoRepository, EntityManager em) {
         this.tipoRepository = tipoRepository;
+        this.em = em;
     }
 
     /**
@@ -45,15 +48,28 @@ public class TipoService {
      * @return El Tipo persistido o Optional.empty() si la descripción ya existe.
      */
     public Optional<Tipo> createTipo(String descripcion) {
-        // Regla de negocio: La descripción debe ser única
-        if (tipoRepository.findByDescripcion(descripcion).isPresent()) {
-            return Optional.empty();
+        em.getTransaction().begin();
+        try {
+            // Regla de negocio: La descripción debe ser única
+            if (tipoRepository.findByDescripcion(descripcion).isPresent()) {
+                em.getTransaction().rollback();
+                return Optional.empty();
+            }
+
+            Tipo nuevoTipo = new Tipo();
+            nuevoTipo.setDescripcion(descripcion);
+
+            Tipo savedTipo = tipoRepository.save(nuevoTipo);
+            em.flush(); // Forzar generación del ID
+            em.getTransaction().commit();
+
+            return Optional.of(savedTipo);
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            throw e;
         }
-
-        Tipo nuevoTipo = new Tipo();
-        nuevoTipo.setDescripcion(descripcion);
-
-        return Optional.of(tipoRepository.save(nuevoTipo));
     }
 
     /**
@@ -64,11 +80,21 @@ public class TipoService {
      * @return true si fue eliminado.
      */
     public boolean deleteTipo(Long id) {
-        Optional<Tipo> tipoOpt = tipoRepository.findById(id);
-        if (tipoOpt.isPresent()) {
-            tipoRepository.delete(tipoOpt.get());
-            return true;
+        em.getTransaction().begin();
+        try {
+            Optional<Tipo> tipoOpt = tipoRepository.findById(id);
+            if (tipoOpt.isPresent()) {
+                tipoRepository.delete(tipoOpt.get());
+                em.getTransaction().commit();
+                return true;
+            }
+            em.getTransaction().rollback();
+            return false;
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            throw e;
         }
-        return false;
     }
 }

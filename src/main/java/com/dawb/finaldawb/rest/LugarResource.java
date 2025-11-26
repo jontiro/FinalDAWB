@@ -1,9 +1,11 @@
 package com.dawb.finaldawb.rest;
 
 import com.dawb.finaldawb.domain.Lugar;
+import com.dawb.finaldawb.rest.dto.LugarRequest;
 import com.dawb.finaldawb.rest.dto.LugarResponse;
 import com.dawb.finaldawb.service.LugarService;
 import jakarta.inject.Inject;
+import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -27,35 +29,26 @@ public class LugarResource {
 
     /**
      * POST /lugares : Crea un nuevo lugar.
-     * @param lugar Objeto Lugar (entidad de dominio, idealmente un DTO).
+     * @param request Objeto LugarRequest con datos del lugar y autorId.
      * @return 201 Created con la URI del nuevo recurso.
      */
     @POST
-    public Response createLugar(Lugar lugar) {
+    public Response createLugar(@Valid LugarRequest request) {
         try {
-            // SIMULACIÓN DE SEGURIDAD: Asignar un autor_id conocido.
-            Long autorId = 1L; // Asume que el usuario 1 está creando esto.
+            // Crear entidad Lugar desde el DTO
+            Lugar lugar = new Lugar();
+            lugar.setNombre(request.getNombre());
+            lugar.setDireccion(request.getDireccion());
+            lugar.setCiudad(request.getCiudad());
+            lugar.setPais(request.getPais());
 
-            // Validar que los campos requeridos no estén vacíos
-            if (lugar.getNombre() == null || lugar.getNombre().isBlank()) {
-                return Response.status(Response.Status.BAD_REQUEST)
-                        .entity("{\"error\": \"El campo 'nombre' es requerido\"}")
-                        .build();
-            }
-
-            if (lugar.getDireccion() == null || lugar.getDireccion().isBlank()) {
-                return Response.status(Response.Status.BAD_REQUEST)
-                        .entity("{\"error\": \"El campo 'direccion' es requerido\"}")
-                        .build();
-            }
-
-            // CORRECCIÓN 1: Usar createLugar y pasar el autorId
-            Lugar nuevoLugar = lugarService.createLugar(lugar, autorId)
+            // Crear el lugar con el autorId del request
+            Lugar nuevoLugar = lugarService.createLugar(lugar, request.getAutorId())
                     .orElse(null);
 
             if (nuevoLugar == null) {
                 return Response.status(Response.Status.BAD_REQUEST)
-                        .entity("{\"error\": \"Error al crear lugar: el usuario con ID " + autorId + " no existe en la base de datos. Primero debes crear un usuario.\"}")
+                        .entity("{\"error\": \"Usuario no encontrado con ID: " + request.getAutorId() + "\"}")
                         .build();
             }
 

@@ -137,4 +137,27 @@ public class UsuarioService {
     public Usuario save(Usuario usuario) {
         return usuarioRepository.save(usuario);
     }
+
+    /**
+     * Actualiza un usuario existente.
+     * @param usuario Usuario con los datos actualizados.
+     * @return Usuario actualizado.
+     */
+    public Usuario update(Usuario usuario) {
+        return usuarioRepository.save(usuario);
+    }
+
+    /**
+     * Elimina un usuario por ID.
+     * @param id ID del usuario a eliminar.
+     * @return true si fue eliminado.
+     */
+    public boolean delete(Long id) {
+        Optional<Usuario> usuarioOpt = usuarioRepository.findById(id);
+        if (usuarioOpt.isPresent()) {
+            usuarioRepository.delete(usuarioOpt.get());
+            return true;
+        }
+        return false;
+    }
 }

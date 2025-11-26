@@ -4,14 +4,16 @@ import com.dawb.finaldawb.domain.Objeto;
 import com.dawb.finaldawb.repository.ObjetoRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import jakarta.transaction.Transactional;
+import jakarta.persistence.EntityManager;
 
 import java.util.List;
 import java.util.Optional;
 
 @ApplicationScoped
-@Transactional
 public class ObjetoService {
+
+    @Inject
+    private EntityManager em;
 
     private ObjetoRepository objetoRepository;
 
@@ -21,8 +23,9 @@ public class ObjetoService {
 
     // Inyección por constructor
     @Inject
-    public ObjetoService(ObjetoRepository objetoRepository) {
+    public ObjetoService(ObjetoRepository objetoRepository, EntityManager em) {
         this.objetoRepository = objetoRepository;
+        this.em = em;
     }
 
     /**
@@ -52,15 +55,28 @@ public class ObjetoService {
      * @return El Objeto persistido o Optional.empty() si la descripción ya existe.
      */
     public Optional<Objeto> createObjeto(String descripcion) {
-        // Regla de negocio: La descripción debe ser única
-        if (objetoRepository.findByDescripcion(descripcion).isPresent()) {
-            return Optional.empty();
+        em.getTransaction().begin();
+        try {
+            // Regla de negocio: La descripción debe ser única
+            if (objetoRepository.findByDescripcion(descripcion).isPresent()) {
+                em.getTransaction().rollback();
+                return Optional.empty();
+            }
+
+            Objeto nuevoObjeto = new Objeto();
+            nuevoObjeto.setDescripcion(descripcion);
+
+            Objeto savedObjeto = objetoRepository.save(nuevoObjeto);
+            em.flush(); // Forzar generación del ID
+            em.getTransaction().commit();
+
+            return Optional.of(savedObjeto);
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            throw e;
         }
-
-        Objeto nuevoObjeto = new Objeto();
-        nuevoObjeto.setDescripcion(descripcion);
-
-        return Optional.of(objetoRepository.save(nuevoObjeto));
     }
 
     /**
@@ -70,11 +86,21 @@ public class ObjetoService {
      * @return true si fue eliminado.
      */
     public boolean deleteObjeto(Long id) {
-        Optional<Objeto> objetoOpt = objetoRepository.findById(id);
-        if (objetoOpt.isPresent()) {
-            objetoRepository.delete(objetoOpt.get());
-            return true;
+        em.getTransaction().begin();
+        try {
+            Optional<Objeto> objetoOpt = objetoRepository.findById(id);
+            if (objetoOpt.isPresent()) {
+                objetoRepository.delete(objetoOpt.get());
+                em.getTransaction().commit();
+                return true;
+            }
+            em.getTransaction().rollback();
+            return false;
+        } catch (Exception e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            throw e;
         }
-        return false;
     }
 }

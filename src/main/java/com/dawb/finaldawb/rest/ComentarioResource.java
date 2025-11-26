@@ -32,29 +32,58 @@ public class ComentarioResource {
     // --- Puntos de Acceso (Endpoints) ---
 
     /**
+     * GET /comentarios : Obtiene todos los comentarios.
+     * @return Lista de todos los comentarios.
+     */
+    @GET
+    public List<ComentarioResponse> findAll() {
+        return comentarioService.findAll()
+                .stream()
+                .map(ComentarioResponse::fromEntity)
+                .collect(Collectors.toList());
+    }
+
+    /**
      * POST /comentarios : Crea un nuevo comentario.
-     * @param request Datos del comentario (texto, recetaId, usuarioId).
+     * @param request Datos del comentario (texto, recetaId o lugarId, usuarioId).
      * @return 201 CREATED o 400 BAD REQUEST.
      */
     @POST
     public Response createComentario(@Valid ComentarioRequest request) {
         try {
-            Comentario savedComentario = comentarioService.createComentarioReceta(
-                    request.getTexto(),
-                    request.getUsuarioId(),
-                    request.getRecetaId()
-            );
+            Comentario savedComentario;
+
+            // Verificar si es un comentario de receta o de lugar
+            if (request.getRecetaId() != null) {
+                // Comentario de receta
+                savedComentario = comentarioService.createComentarioReceta(
+                        request.getTexto(),
+                        request.getUsuarioId(),
+                        request.getRecetaId()
+                );
+            } else if (request.getLugarId() != null) {
+                // Comentario de lugar
+                savedComentario = comentarioService.createComentarioLugar(
+                        request.getTexto(),
+                        request.getUsuarioId(),
+                        request.getLugarId()
+                );
+            } else {
+                return Response.status(Response.Status.BAD_REQUEST)
+                        .entity("{\"error\": \"Debe proporcionar recetaId o lugarId\"}")
+                        .build();
+            }
 
             return Response.status(Response.Status.CREATED)
                     .entity(ComentarioResponse.fromEntity(savedComentario))
                     .build();
         } catch (IllegalArgumentException e) {
             return Response.status(Response.Status.BAD_REQUEST)
-                    .entity(e.getMessage())
+                    .entity("{\"error\": \"" + e.getMessage() + "\"}")
                     .build();
         } catch (IllegalStateException e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity(e.getMessage())
+                    .entity("{\"error\": \"" + e.getMessage() + "\"}")
                     .build();
         }
     }

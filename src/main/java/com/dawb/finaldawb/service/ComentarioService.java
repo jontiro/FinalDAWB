@@ -1,10 +1,12 @@
 package com.dawb.finaldawb.service;
 
 import com.dawb.finaldawb.domain.Comentario;
+import com.dawb.finaldawb.domain.Lugar;
 import com.dawb.finaldawb.domain.Objeto;
 import com.dawb.finaldawb.domain.Receta;
 import com.dawb.finaldawb.domain.Usuario;
 import com.dawb.finaldawb.repository.ComentarioRepository;
+import com.dawb.finaldawb.repository.LugarRepository;
 import com.dawb.finaldawb.repository.RecetaRepository;
 import com.dawb.finaldawb.repository.UsuarioRepository;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -24,6 +26,7 @@ public class ComentarioService {
     private ObjetoService objetoService;
     private UsuarioRepository usuarioRepository;
     private RecetaRepository recetaRepository;
+    private LugarRepository lugarRepository;
 
     // Constructor vacío requerido por CDI
     protected ComentarioService() {
@@ -35,11 +38,13 @@ public class ComentarioService {
                              ObjetoService objetoService,
                              UsuarioRepository usuarioRepository,
                              RecetaRepository recetaRepository,
+                             LugarRepository lugarRepository,
                              EntityManager em) {
         this.comentarioRepository = comentarioRepository;
         this.objetoService = objetoService;
         this.usuarioRepository = usuarioRepository;
         this.recetaRepository = recetaRepository;
+        this.lugarRepository = lugarRepository;
         this.em = em;
     }
 
@@ -48,6 +53,13 @@ public class ComentarioService {
      */
     public Optional<Comentario> findById(Long id) {
         return comentarioRepository.findById(id);
+    }
+
+    /**
+     * Obtiene todos los comentarios.
+     */
+    public List<Comentario> findAll() {
+        return comentarioRepository.findAll();
     }
 
     /**
@@ -147,6 +159,56 @@ public class ComentarioService {
         }
     }
 
+    /**
+     * Crea un nuevo comentario sobre un lugar.
+     * @param contenido Texto del comentario.
+     * @param autorId ID del usuario que publica.
+     * @param lugarId ID del lugar comentado.
+     * @return El Comentario persistido.
+     * @throws IllegalArgumentException si el usuario o el lugar no existen.
+     */
+    public Comentario createComentarioLugar(String contenido, Long autorId, Long lugarId) {
+        // Iniciar transacción manual
+        em.getTransaction().begin();
+        try {
+            // 1. Verificar y obtener el Autor
+            Usuario autor = usuarioRepository.findById(autorId)
+                    .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado con id: " + autorId));
+
+            // 2. Verificar y obtener el Lugar
+            Lugar lugar = lugarRepository.findById(lugarId)
+                    .orElseThrow(() -> new IllegalArgumentException("Lugar no encontrado con id: " + lugarId));
+
+            // 3. Obtener el Objeto tipo "Lugar"
+            Objeto objetoLugar = objetoService.findByDescripcion("Lugar")
+                    .orElseThrow(() -> new IllegalStateException("Tipo 'Lugar' no existe en la tabla objeto"));
+
+            // 4. Crear el comentario
+            Comentario comentario = new Comentario();
+            comentario.setContenido(contenido);
+            comentario.setAutor(autor);
+            comentario.setObjeto(objetoLugar);
+            comentario.setEntidadId(lugarId);
+            comentario.setModerado(false);
+
+            // 5. Persistir
+            Comentario savedComentario = comentarioRepository.save(comentario);
+
+            // 6. Flush para obtener el ID generado
+            em.flush();
+
+            // 7. Commit de la transacción
+            em.getTransaction().commit();
+
+            return savedComentario;
+        } catch (Exception e) {
+            // Rollback en caso de error
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            throw e;
+        }
+    }
     /**
      * Crea un nuevo comentario (método genérico, compatible con el código anterior).
      * @deprecated Usar createComentarioReceta() para mayor claridad
