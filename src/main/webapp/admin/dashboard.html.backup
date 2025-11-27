@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Admin - Cocina Social</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-gray-50">
+
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg fixed w-full top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <i class="fas fa-shield-alt text-3xl text-blue-600 mr-3"></i>
+                    <span class="text-2xl font-bold text-blue-600">Admin Panel</span>
+                </div>
+                <div class="hidden md:flex space-x-8">
+                    <a href="../home.html" class="text-gray-700 hover:text-blue-600 transition">Inicio</a>
+                    <a href="../recetas.html" class="text-gray-700 hover:text-blue-600 transition">Recetas</a>
+                    <a href="../lugares.html" class="text-gray-700 hover:text-blue-600 transition">Lugares</a>
+                    <a href="../comunidad.html" class="text-gray-700 hover:text-blue-600 transition">Comunidad</a>
+                </div>
+                <div class="flex space-x-3" id="nav-buttons"></div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header -->
+    <div class="pt-24 pb-12 bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h1 class="text-4xl md:text-5xl font-bold mb-4">
+                <i class="fas fa-shield-alt mr-3"></i>Panel de Administración
+            </h1>
+            <p class="text-xl text-blue-100">Gestiona tu plataforma de forma eficiente</p>
+        </div>
+    </div>
+
+    <!-- Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 pb-20">
+
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm font-medium">Recetas</p>
+                        <p class="text-3xl font-bold text-gray-900" id="stat-recetas">0</p>
+                    </div>
+                    <div class="w-14 h-14 bg-orange-100 rounded-full flex items-center justify-center">
+                        <i class="fas fa-utensils text-orange-600 text-2xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm font-medium">Lugares</p>
+                        <p class="text-3xl font-bold text-gray-900" id="stat-lugares">0</p>
+                    </div>
+                    <div class="w-14 h-14 bg-pink-100 rounded-full flex items-center justify-center">
+                        <i class="fas fa-map-marker-alt text-pink-600 text-2xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm font-medium">Comentarios</p>
+                        <p class="text-3xl font-bold text-gray-900" id="stat-comentarios">0</p>
+                    </div>
+                    <div class="w-14 h-14 bg-teal-100 rounded-full flex items-center justify-center">
+                        <i class="fas fa-comments text-teal-600 text-2xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm font-medium">Usuarios</p>
+                        <p class="text-3xl font-bold text-gray-900" id="stat-usuarios">0</p>
+                    </div>
+                    <div class="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center">
+                        <i class="fas fa-users text-blue-600 text-2xl"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabs Navigation -->
+        <div class="bg-white rounded-lg shadow-lg overflow-hidden mb-8">
+            <div class="border-b border-gray-200">
+                <nav class="flex space-x-4 px-6" aria-label="Tabs">
+                    <button onclick="showTab('comentarios')"
+                            class="admin-tab active py-4 px-4 border-b-2 border-blue-600 font-medium text-sm text-blue-600">
+                        <i class="fas fa-comment-dots mr-2"></i> Comentarios
+                    </button>
+                    <button onclick="showTab('graficas')"
+                            class="admin-tab py-4 px-4 border-b-2 border-transparent font-medium text-sm text-gray-500">
+                        <i class="fas fa-chart-line mr-2"></i> Gráficas
+                    </button>
+                    <button onclick="showTab('usuarios')"
+                            class="admin-tab py-4 px-4 border-b-2 border-transparent font-medium text-sm text-gray-500">
+                        <i class="fas fa-users-cog mr-2"></i> Usuarios
+                    </button>
+                </nav>
+            </div>
+
+            <!-- Tab: Comentarios -->
+            <div id="tab-comentarios" class="tab-content p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-2xl font-bold text-gray-900">
+                        <i class="fas fa-tasks mr-2 text-blue-600"></i>
+                        Moderar Comentarios
+                    </h2>
+                    <button onclick="loadComentarios()"
+                            class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+                        <i class="fas fa-sync-alt mr-2"></i> Actualizar
+                    </button>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Usuario</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Comentario</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Contenido</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Fecha</th>
+                                <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="comentarios-table" class="bg-white divide-y divide-gray-200">
+                            <tr><td colspan="6" class="px-6 py-4 text-center text-gray-500">Cargando...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Tab: Gráficas -->
+            <div id="tab-graficas" class="tab-content p-6 hidden">
+                <h2 class="text-2xl font-bold text-gray-900 mb-6">
+                    <i class="fas fa-chart-bar mr-2 text-blue-600"></i>
+                    Estadísticas y Gráficas
+                </h2>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                    <div class="bg-white p-6 rounded-lg shadow">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">
+                            <i class="fas fa-users text-blue-600 mr-2"></i>
+                            Usuarios Activos (Últimos 7 Días)
+                        </h3>
+                        <canvas id="chartUsuarios"></canvas>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-lg shadow">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">
+                            <i class="fas fa-utensils text-orange-600 mr-2"></i>
+                            Recetas Publicadas (Últimos 7 Días)
+                        </h3>
+                        <canvas id="chartRecetas"></canvas>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-lg shadow">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">
+                        <i class="fas fa-chart-pie text-green-600 mr-2"></i>
+                        Distribución de Contenido
+                    </h3>
+                    <div class="max-w-md mx-auto">
+                        <canvas id="chartContenido"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab: Usuarios -->
+            <div id="tab-usuarios" class="tab-content p-6 hidden">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-2xl font-bold text-gray-900">
+                        <i class="fas fa-users-cog mr-2 text-blue-600"></i>
+                        Gestión de Usuarios
+                    </h2>
+                    <button onclick="showCreateUserModal()"
+                            class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">
+                        <i class="fas fa-user-plus mr-2"></i> Crear Usuario
+                    </button>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Usuario</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Rol</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Estado</th>
+                                <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usuarios-table" class="bg-white divide-y divide-gray-200">
+                            <tr><td colspan="6" class="px-6 py-4 text-center text-gray-500">Cargando...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Ver Usuario -->
+    <div id="ver-usuario-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-2xl w-full p-8 relative">
+            <button onclick="closeVerUsuarioModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+                <i class="fas fa-times text-2xl"></i>
+            </button>
+            <h3 class="text-3xl font-bold text-gray-900 mb-6">
+                <i class="fas fa-user-circle text-blue-600 mr-2"></i>
+                Información del Usuario
+            </h3>
+            <div id="usuario-info-content"></div>
+        </div>
+    </div>
+
+    <!-- Modal: Crear/Editar Usuario -->
+    <div id="usuario-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-2xl w-full p-8 relative max-h-[90vh] overflow-y-auto">
+            <button onclick="closeUsuarioModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+                <i class="fas fa-times text-2xl"></i>
+            </button>
+            <h3 class="text-3xl font-bold text-gray-900 mb-6">
+                <i class="fas fa-user-edit text-blue-600 mr-2"></i>
+                <span id="usuario-modal-title">Crear Usuario</span>
+            </h3>
+
+            <form id="usuario-form" class="space-y-4">
+                <input type="hidden" id="usuario-id">
+
+                <div>
+                    <label class="block text-gray-700 mb-2 font-medium">Usuario *</label>
+                    <input type="text" id="usuario-username" required
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600">
+                </div>
+
+                <div>
+                    <label class="block text-gray-700 mb-2 font-medium">Email *</label>
+                    <input type="email" id="usuario-email" required
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600">
+                </div>
+
+                <div>
+                    <label class="block text-gray-700 mb-2 font-medium">
+                        Contraseña <span id="password-required">*</span>
+                    </label>
+                    <input type="password" id="usuario-password"
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600">
+                    <p class="text-sm text-gray-500 mt-1" id="password-hint">Mínimo 6 caracteres</p>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-gray-700 mb-2 font-medium">Rol *</label>
+                        <select id="usuario-rol" required
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600">
+                            <option value="">Seleccionar...</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 mb-2 font-medium">Estado *</label>
+                        <select id="usuario-estado" required
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600">
+                            <option value="ACTIVO">Activo</option>
+                            <option value="BLOQUEADO">Bloqueado</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button type="submit"
+                        class="w-full py-3 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-lg font-semibold hover:from-blue-700 hover:to-cyan-700 transition">
+                    <i class="fas fa-save mr-2"></i> Guardar Usuario
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div id="footer"></div>
+
+    <script src="../assets/js/components.js"></script>
+    <script src="../assets/js/auth-modal.js"></script>
+    <script src="../assets/js/csrf-protection.js"></script>
+    <script src="dashboard.js"></script>
+
+    <style>
+        .admin-tab { cursor: pointer; transition: all 0.3s; }
+        .admin-tab.active { color: rgb(37, 99, 235); border-bottom-color: rgb(37, 99, 235); }
+        .admin-tab:not(.active) { color: rgb(107, 114, 128); border-bottom-color: transparent; }
+        .admin-tab:not(.active):hover { color: rgb(59, 130, 246); }
+    </style>
+
+</body>
+</html>
+        let currentUsuarioId = null;
+        let roles = [];
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function sanitizeNumber(value) {
+            const num = parseInt(value);
+            return isNaN(num) ? 0 : num;
+        }
+
+        // TABS
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.add('hidden'));
+            document.querySelectorAll('.admin-tab').forEach(btn => {
+                btn.classList.remove('active', 'border-blue-600', 'text-blue-600');
+                btn.classList.add('border-transparent', 'text-gray-500');
+            });
+
+            document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+            event.target.closest('.admin-tab').classList.add('active', 'border-blue-600', 'text-blue-600');
+            event.target.closest('.admin-tab').classList.remove('border-transparent', 'text-gray-500');
+
+            if (tabName === 'comentarios') loadComentarios();
+            else if (tabName === 'graficas') loadGraficas();
+            else if (tabName === 'usuarios') loadUsuarios();
+        }
+
+        // ESTADÍSTICAS
+        async function loadStats() {
+            try {
+                const [recetas, lugares, comentarios, usuariosData] = await Promise.all([
+                    fetch(`${API_BASE_URL}/recetas`).then(r => r.ok ? r.json() : []).catch(() => []),
+                    fetch(`${API_BASE_URL}/lugares`).then(r => r.ok ? r.json() : []).catch(() => []),
+                    fetch(`${API_BASE_URL}/comentarios`).then(r => r.ok ? r.json() : []).catch(() => []),
+                    fetch(`${API_BASE_URL}/auth/count`).then(r => r.ok ? r.json() : null).catch(() => null)
+                ]);
+
+                document.getElementById('stat-recetas').textContent = recetas.length;
+                document.getElementById('stat-lugares').textContent = lugares.length;
+                document.getElementById('stat-comentarios').textContent = comentarios.length;
+                if (usuariosData?.count) document.getElementById('stat-usuarios').textContent = usuariosData.count;
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+
+        // COMENTARIOS
+        async function loadComentarios() {
+            const tbody = document.getElementById('comentarios-table');
+            tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-4 text-center"><i class="fas fa-spinner fa-spin"></i> Cargando...</td></tr>';
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/comentarios`);
+                if (!response.ok) throw new Error('Error');
+
+                const comentarios = await response.json();
+
+                if (!Array.isArray(comentarios) || comentarios.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-4 text-center text-gray-500">No hay comentarios</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = comentarios.map(c => `
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 text-sm font-medium">${sanitizeNumber(c.id)}</td>
+                        <td class="px-6 py-4 text-sm">${escapeHtml(c.autorUsername) || 'N/A'}</td>
+                        <td class="px-6 py-4 text-sm max-w-xs truncate">${escapeHtml(c.texto)}</td>
+                        <td class="px-6 py-4 text-sm">${c.recetaId ? `Receta #${c.recetaId}` : `Lugar #${c.lugarId}`}</td>
+                        <td class="px-6 py-4 text-sm">${c.fechaCreacion ? new Date(c.fechaCreacion).toLocaleDateString('es-ES') : 'N/A'}</td>
+                        <td class="px-6 py-4 text-center space-x-2">
+                            <button onclick="ocultarComentario(${c.id})"
+                                    class="px-3 py-1 bg-yellow-600 text-white text-xs rounded hover:bg-yellow-700">
+                                <i class="fas fa-eye-slash"></i> Ocultar
+                            </button>
+                            <button onclick="eliminarComentario(${c.id})"
+                                    class="px-3 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700">
+                                <i class="fas fa-trash"></i> Borrar
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (error) {
+                tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-4 text-center text-red-600">Error al cargar</td></tr>';
+            }
+        }
+
+        async function ocultarComentario(id) {
+            if (!confirm('¿Ocultar este comentario?')) return;
+            try {
+                const response = await CsrfProtection.protectedFetch(`${API_BASE_URL}/admin/comentarios/${id}/rechazar`, {
+                    method: 'PUT'
+                });
+                if (response.ok) {
+                    showToast('Ocultado', 'Comentario ocultado', 'success');
+                    loadComentarios();
+                } else showToast('Error', 'No se pudo ocultar', 'error');
+            } catch (error) {
+                showToast('Error', 'No se pudo ocultar', 'error');
+            }
+        }
+
+        async function eliminarComentario(id) {
+            if (!confirm('¿Eliminar permanentemente?')) return;
+            try {
+                const response = await CsrfProtection.protectedFetch(`${API_BASE_URL}/comentarios/${id}`, {
+                    method: 'DELETE'
+                });
+                if (response.ok) {
+                    showToast('Eliminado', 'Comentario eliminado', 'success');
+                    loadComentarios();
+                    loadStats();
+                } else showToast('Error', 'No se pudo eliminar', 'error');
+            } catch (error) {
+                showToast('Error', 'No se pudo eliminar', 'error');
+            }
+        }
+
+        // GRÁFICAS
+        let chartUsuarios, chartRecetas, chartContenido;
+
+        async function loadGraficas() {
+            if (chartUsuarios) chartUsuarios.destroy();
+            if (chartRecetas) chartRecetas.destroy();
+            if (chartContenido) chartContenido.destroy();
+
+            const labels = [];
+            const today = new Date();
+            for (let i = 6; i >= 0; i--) {
+                const date = new Date(today);
+                date.setDate(date.getDate() - i);
+                labels.push(date.toLocaleDateString('es-ES', { day: '2-digit', month: 'short' }));
+            }
+
+            const ctxUsuarios = document.getElementById('chartUsuarios').getContext('2d');
+            chartUsuarios = new Chart(ctxUsuarios, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Usuarios Activos',
+                        data: [12, 19, 15, 25, 22, 30, 35],
+                        borderColor: 'rgb(59, 130, 246)',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true } }
+                }
+            });
+
+            const ctxRecetas = document.getElementById('chartRecetas').getContext('2d');
+            chartRecetas = new Chart(ctxRecetas, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Recetas Publicadas',
+                        data: [3, 5, 2, 8, 4, 6, 7],
+                        backgroundColor: 'rgba(251, 146, 60, 0.8)',
+                        borderColor: 'rgb(251, 146, 60)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true } }
+                }
+            });
+
+            try {
+                const [recetas, lugares, comentarios] = await Promise.all([
+                    fetch(`${API_BASE_URL}/recetas`).then(r => r.ok ? r.json() : []),
+                    fetch(`${API_BASE_URL}/lugares`).then(r => r.ok ? r.json() : []),
+                    fetch(`${API_BASE_URL}/comentarios`).then(r => r.ok ? r.json() : [])
+                ]);
+
+                const ctxContenido = document.getElementById('chartContenido').getContext('2d');
+                chartContenido = new Chart(ctxContenido, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Recetas', 'Lugares', 'Comentarios'],
+                        datasets: [{
+                            data: [recetas.length, lugares.length, comentarios.length],
+                            backgroundColor: ['rgba(251, 146, 60, 0.8)', 'rgba(236, 72, 153, 0.8)', 'rgba(20, 184, 166, 0.8)']
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: { legend: { position: 'bottom' } }
+                    }
+                });
+            } catch (error) {
+                console.error('Error loading charts:', error);
+            }
+        }
+
+        // USUARIOS
+        async function loadUsuarios() {
+            const tbody = document.getElementById('usuarios-table');
+            tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-4 text-center"><i class="fas fa-spinner fa-spin"></i> Cargando...</td></tr>';
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/admin/usuarios/todos`);
+                if (!response.ok) throw new Error('Error');
+
+                const usuarios = await response.json();
+
+                if (!Array.isArray(usuarios) || usuarios.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-4 text-center text-gray-500">No hay usuarios</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = usuarios.map(u => {
+                    const estadoBadge = u.estado === 'ACTIVO'
+                        ? '<span class="px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full">Activo</span>'
+                        : '<span class="px-2 py-1 text-xs bg-red-100 text-red-800 rounded-full">Bloqueado</span>';
+
+                    const rolBadge = u.role === 'ADMIN'
+                        ? '<span class="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full">Admin</span>'
+                        : '<span class="px-2 py-1 text-xs bg-gray-100 text-gray-800 rounded-full">Usuario</span>';
+
+                    return `
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4 text-sm font-medium">${sanitizeNumber(u.id)}</td>
+                            <td class="px-6 py-4 text-sm">${escapeHtml(u.username)}</td>
+                            <td class="px-6 py-4 text-sm">${escapeHtml(u.email)}</td>
+                            <td class="px-6 py-4 text-sm">${rolBadge}</td>
+                            <td class="px-6 py-4 text-sm">${estadoBadge}</td>
+                            <td class="px-6 py-4 text-center">
+                                <div class="flex justify-center space-x-2">
+                                    <button onclick="verUsuario(${u.id})" class="px-2 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button onclick="editUsuario(${u.id})" class="px-2 py-1 bg-yellow-600 text-white text-xs rounded hover:bg-yellow-700">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button onclick="deleteUsuario(${u.id})" class="px-2 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+            } catch (error) {
+                tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-4 text-center text-red-600">Error al cargar</td></tr>';
+            }
+        }
+
+        async function verUsuario(id) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/admin/usuarios/${id}`);
+                if (!response.ok) throw new Error('Error');
+
+                const u = await response.json();
+                const content = `
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div><p class="text-sm text-gray-500">ID</p><p class="text-lg font-semibold">#${u.id}</p></div>
+                            <div><p class="text-sm text-gray-500">Usuario</p><p class="text-lg font-semibold">${escapeHtml(u.username)}</p></div>
+                        </div>
+                        <div><p class="text-sm text-gray-500">Email</p><p class="text-lg">${escapeHtml(u.email)}</p></div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div><p class="text-sm text-gray-500">Rol</p><p class="text-lg font-semibold ${u.role === 'ADMIN' ? 'text-blue-600' : 'text-gray-600'}">${u.role}</p></div>
+                            <div><p class="text-sm text-gray-500">Estado</p><p class="text-lg font-semibold ${u.estado === 'ACTIVO' ? 'text-green-600' : 'text-red-600'}">${u.estado}</p></div>
+                        </div>
+                    </div>
+                `;
+                document.getElementById('usuario-info-content').innerHTML = content;
+                document.getElementById('ver-usuario-modal').classList.remove('hidden');
+            } catch (error) {
+                showToast('Error', 'No se pudo cargar el usuario', 'error');
+            }
+        }
+
+        function closeVerUsuarioModal() {
+            document.getElementById('ver-usuario-modal').classList.add('hidden');
+        }
+
+        async function loadRoles() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/roles`);
+                if (response.ok) {
+                    roles = await response.json();
+                    const select = document.getElementById('usuario-rol');
+                    select.innerHTML = '<option value="">Seleccionar...</option>' +
+                        roles.map(r => `<option value="${r.id}">${r.nombre}</option>`).join('');
+                }
+            } catch (error) {
+                console.error('Error loading roles:', error);
+            }
+        }
+
+        function showCreateUserModal() {
+            currentUsuarioId = null;
+            document.getElementById('usuario-modal-title').textContent = 'Crear Usuario';
+            document.getElementById('usuario-form').reset();
+            document.getElementById('usuario-id').value = '';
+            document.getElementById('password-required').textContent = '*';
+            document.getElementById('password-hint').textContent = 'Mínimo 6 caracteres';
+            document.getElementById('usuario-password').required = true;
+            document.getElementById('usuario-modal').classList.remove('hidden');
+        }
+
+        async function editUsuario(id) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/admin/usuarios/${id}`);
+                if (!response.ok) throw new Error('Error');
+
+                const usuario = await response.json();
+                currentUsuarioId = id;
+                document.getElementById('usuario-modal-title').textContent = 'Editar Usuario';
+                document.getElementById('usuario-id').value = usuario.id;
+                document.getElementById('usuario-username').value = usuario.username;
+                document.getElementById('usuario-email').value = usuario.email;
+                document.getElementById('usuario-rol').value = usuario.roleId;
+                document.getElementById('usuario-estado').value = usuario.estado;
+                document.getElementById('usuario-password').value = '';
+                document.getElementById('usuario-password').required = false;
+                document.getElementById('password-required').textContent = '';
+                document.getElementById('password-hint').textContent = 'Dejar en blanco para no cambiar';
+                document.getElementById('usuario-modal').classList.remove('hidden');
+            } catch (error) {
+                showToast('Error', 'No se pudo cargar el usuario', 'error');
+            }
+        }
+
+        function closeUsuarioModal() {
+            document.getElementById('usuario-modal').classList.add('hidden');
+            currentUsuarioId = null;
+        }
+
+        async function deleteUsuario(id) {
+            if (!confirm('¿Eliminar este usuario permanentemente?')) return;
+            try {
+                const response = await CsrfProtection.protectedFetch(`${API_BASE_URL}/admin/usuarios/${id}`, {
+                    method: 'DELETE'
+                });
+                if (response.ok) {
+                    showToast('Eliminado', 'Usuario eliminado', 'success');
+                    loadUsuarios();
+                    loadStats();
+                } else {
+                    const data = await response.json();
+                    showToast('Error', data.error || 'No se pudo eliminar', 'error');
+                }
+            } catch (error) {
+                showToast('Error', 'No se pudo eliminar', 'error');
+            }
+        }
+
+        document.getElementById('usuario-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const payload = {
+                username: document.getElementById('usuario-username').value,
+                email: document.getElementById('usuario-email').value,
+                roleId: parseInt(document.getElementById('usuario-rol').value),
+                estado: document.getElementById('usuario-estado').value
+            };
+
+            const password = document.getElementById('usuario-password').value;
+            if (password) payload.password = password;
+
+            try {
+                const url = currentUsuarioId
+                    ? `${API_BASE_URL}/admin/usuarios/${currentUsuarioId}`
+                    : `${API_BASE_URL}/admin/usuarios`;
+                const method = currentUsuarioId ? 'PUT' : 'POST';
+
+                const response = await CsrfProtection.protectedFetch(url, {
+                    method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (response.ok) {
+                    showToast('¡Éxito!', `Usuario ${currentUsuarioId ? 'actualizado' : 'creado'}`, 'success');
+                    closeUsuarioModal();
+                    loadUsuarios();
+                    loadStats();
+                } else {
+                    const data = await response.json();
+                    showToast('Error', data.error || 'Error al guardar', 'error');
+                }
+            } catch (error) {
+                showToast('Error', 'No se pudo guardar', 'error');
+            }
+        });
+
+        function showToast(title, message, type = 'info') {
+            const colors = {
+                success: 'bg-green-600',
+                error: 'bg-red-600',
+                info: 'bg-blue-600'
+            };
+            const toast = document.createElement('div');
+            toast.className = `fixed bottom-4 right-4 ${colors[type]} text-white px-6 py-4 rounded-lg shadow-lg z-50`;
+            toast.innerHTML = `<div class="flex items-center">
+                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'} mr-3"></i>
+                <div><p class="font-bold">${title}</p><p class="text-sm">${message}</p></div>
+            </div>`;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        // INIT
+        function checkAdmin() {
+            const user = getUser();
+            if (!user || user.role !== 'ADMIN') {
+                window.location.href = '../home.html';
+            }
+        }
+
+        checkAdmin();
+        loadStats();
+        loadComentarios();
+        loadRoles();
+    </script>
+
+    <style>
+        .admin-tab { cursor: pointer; transition: all 0.3s; }
+        .admin-tab.active { color: rgb(37, 99, 235); border-bottom-color: rgb(37, 99, 235); }
+        .admin-tab:not(.active) { color: rgb(107, 114, 128); border-bottom-color: transparent; }
+        .admin-tab:not(.active):hover { color: rgb(59, 130, 246); }
+    </style>
+
+</body>
+</html>
+

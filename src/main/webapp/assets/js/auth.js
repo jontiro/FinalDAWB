@@ -1,9 +1,12 @@
 // auth.js - Sistema de autenticación simplificado
-const API_BASE_URL = (() => {
-    const currentPath = window.location.pathname;
-    const contextPath = currentPath.substring(0, currentPath.indexOf('/', 1)) || '';
-    return `${contextPath}/api`;
-})();
+// Definir API_BASE_URL globalmente en window para compartir con otros scripts
+if (!window.API_BASE_URL) {
+    window.API_BASE_URL = (() => {
+        const currentPath = window.location.pathname;
+        const contextPath = currentPath.substring(0, currentPath.indexOf('/', 1)) || '';
+        return `${contextPath}/api`;
+    })();
+}
 
 const Auth = {
     // Obtener usuario logueado
@@ -92,7 +95,7 @@ async function handleLogin(e) {
     const password = document.getElementById('login-password').value;
 
     try {
-        const response = await fetch(`${API_BASE_URL}/auth/login`, {
+        const response = await fetch(`${window.API_BASE_URL}/auth/login`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ usernameOrEmail: username, password })
@@ -130,7 +133,7 @@ async function handleRegister(e) {
     };
 
     try {
-        const response = await fetch(`${API_BASE_URL}/auth/register`, {
+        const response = await fetch(`${window.API_BASE_URL}/auth/register`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)

@@ -156,6 +156,34 @@ public class AdminResource {
                 .orElse(Response.status(Response.Status.NOT_FOUND).build());
     }
 
+    /**
+     * PUT /admin/comentarios/{id}/rechazar : Oculta/rechaza un comentario.
+     * @param id ID del comentario.
+     * @return 200 OK o 404 NOT FOUND.
+     */
+    @PUT
+    @Path("/comentarios/{id}/rechazar")
+    public Response rechazarComentario(@PathParam("id") Long id) {
+        return comentarioService.updateModeracion(id, false)
+                .map(ComentarioResponse::fromEntity)
+                .map(comentarioResponse -> Response.ok(comentarioResponse).build())
+                .orElse(Response.status(Response.Status.NOT_FOUND).build());
+    }
+
+    /**
+     * PUT /admin/comentarios/{id}/aprobar : Aprueba un comentario.
+     * @param id ID del comentario.
+     * @return 200 OK o 404 NOT FOUND.
+     */
+    @PUT
+    @Path("/comentarios/{id}/aprobar")
+    public Response aprobarComentario(@PathParam("id") Long id) {
+        return comentarioService.updateModeracion(id, true)
+                .map(ComentarioResponse::fromEntity)
+                .map(comentarioResponse -> Response.ok(comentarioResponse).build())
+                .orElse(Response.status(Response.Status.NOT_FOUND).build());
+    }
+
     // --- 2. GESTIÓN DE CATÁLOGOS (TIPOS DE RECOMENDACION) ---
 
     /**

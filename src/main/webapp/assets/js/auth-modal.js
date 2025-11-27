@@ -1,11 +1,14 @@
 // auth-modal.js - Sistema de autenticación con modales
-// Detección automática de API URL
-const currentPath = window.location.pathname;
-const contextPath = currentPath.substring(0, currentPath.indexOf('/', 1)) || '';
-const API_BASE_URL = contextPath + '/api';
+// Usar API_BASE_URL de window (ya definida por auth.js)
+if (!window.API_BASE_URL) {
+    window.API_BASE_URL = (() => {
+        const currentPath = window.location.pathname;
+        const contextPath = currentPath.substring(0, currentPath.indexOf('/', 1)) || '';
+        return contextPath + '/api';
+    })();
+}
 
-console.log('Auth Modal - Context Path:', contextPath);
-console.log('Auth Modal - API Base URL:', API_BASE_URL);
+console.log('Auth Modal - API Base URL:', window.API_BASE_URL);
 
 // ==================== GESTIÓN DE MODALES ====================
 
@@ -188,7 +191,7 @@ async function handleLoginSubmit(e) {
     console.log('Intentando login con usuario:', username);
 
     try {
-        const response = await fetch(API_BASE_URL + '/auth/login', {
+        const response = await fetch(window.API_BASE_URL + '/auth/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ usernameOrEmail: username, password })
@@ -247,7 +250,7 @@ async function handleRegisterSubmit(e) {
     console.log('Intentando registro:', payload.username);
 
     try {
-        const response = await fetch(API_BASE_URL + '/auth/register', {
+        const response = await fetch(window.API_BASE_URL + '/auth/register', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
