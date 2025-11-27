@@ -253,10 +253,37 @@
 
     <script src="assets/js/components.js"></script>
     <script src="assets/js/auth-modal.js"></script>
+    <script src="assets/js/csrf-protection.js"></script>
     <script>
         Components.loadFooter();
 
         let currentRecetaId = null;
+
+        // ========================================
+        // FUNCIONES DE SEGURIDAD - PREVENCIÓN XSS
+        // ========================================
+
+        /**
+         * Sanitiza texto para prevenir XSS al insertar en HTML
+         * @param {string} text - Texto a sanitizar
+         * @returns {string} - Texto sanitizado
+         */
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        /**
+         * Sanitiza un número entero
+         * @param {*} value - Valor a sanitizar
+         * @returns {number} - Número válido o 0
+         */
+        function sanitizeNumber(value) {
+            const num = parseInt(value);
+            return isNaN(num) ? 0 : num;
+        }
 
         // Verificar si el usuario es admin
         function isAdmin() {
@@ -357,9 +384,9 @@
                         pasosHtml = receta.pasos.map(paso => `
                             <div class="flex items-start space-x-4 mb-4">
                                 <span class="flex-shrink-0 w-10 h-10 bg-purple-600 text-white rounded-full flex items-center justify-center font-bold text-lg">
-                                    ${paso.orden}
+                                    ${sanitizeNumber(paso.orden)}
                                 </span>
-                                <p class="text-gray-700 pt-2">${paso.descripcion}</p>
+                                <p class="text-gray-700 pt-2">${escapeHtml(paso.descripcion)}</p>
                             </div>
                         `).join('');
                     } else {
@@ -374,7 +401,7 @@
                                 <div class="flex flex-wrap gap-2">
                                     ${receta.tagIds.map(tagId => `
                                         <span class="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-sm">
-                                            Tag #${tagId}
+                                            Tag #${sanitizeNumber(tagId)}
                                         </span>
                                     `).join('')}
                                 </div>
@@ -388,7 +415,7 @@
                                 <div>
                                     <h3 class="text-3xl font-bold text-gray-900 mb-2">
                                         <i class="fas fa-utensils text-purple-600 mr-2"></i>
-                                        ${receta.titulo}
+                                        ${escapeHtml(receta.titulo)}
                                     </h3>
                                     <div class="flex items-center space-x-4 text-gray-600">
                                         <span>
@@ -396,13 +423,13 @@
                                                 ? '<span class="bg-red-100 text-red-600 px-3 py-1 rounded-full text-sm">🔒 Privada</span>'
                                                 : '<span class="bg-green-100 text-green-600 px-3 py-1 rounded-full text-sm">🌐 Pública</span>'}
                                         </span>
-                                        <span><i class="far fa-clock mr-1"></i> ${receta.tiempoPreparacion} minutos</span>
+                                        <span><i class="far fa-clock mr-1"></i> ${sanitizeNumber(receta.tiempoPreparacion)} minutos</span>
                                     </div>
                                 </div>
                             </div>
-                            <p class="text-gray-700 text-lg mb-4">${receta.descripcion || 'Sin descripción'}</p>
+                            <p class="text-gray-700 text-lg mb-4">${escapeHtml(receta.descripcion) || 'Sin descripción'}</p>
                             <p class="text-gray-500 text-sm">
-                                <i class="far fa-user mr-1"></i> Creado por: <span class="font-semibold">${receta.creadorUsername || 'Anónimo'}</span>
+                                <i class="far fa-user mr-1"></i> Creado por: <span class="font-semibold">${escapeHtml(receta.creadorUsername) || 'Anónimo'}</span>
                             </p>
                         </div>
 
@@ -415,11 +442,11 @@
 
                         ${canEdit ? `
                             <div class="flex space-x-3 pt-4 border-t">
-                                <button onclick="closeVerRecetaModal(); editReceta(${receta.id})"
+                                <button onclick="closeVerRecetaModal(); editReceta(${sanitizeNumber(receta.id)})"
                                         class="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-semibold">
                                     <i class="fas fa-edit mr-2"></i> Editar Receta
                                 </button>
-                                <button onclick="closeVerRecetaModal(); deleteReceta(${receta.id})"
+                                <button onclick="closeVerRecetaModal(); deleteReceta(${sanitizeNumber(receta.id)})"
                                         class="flex-1 px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition font-semibold">
                                     <i class="fas fa-trash mr-2"></i> Eliminar
                                 </button>
@@ -468,27 +495,27 @@
                     const canEdit = user && (receta.creadorId === user.id || isAdmin());
                     return `
                         <div class="recipe-card bg-white rounded-2xl shadow-lg overflow-hidden cursor-pointer hover:shadow-2xl transition-shadow duration-300"
-                             onclick="verReceta(${receta.id})">
+                             onclick="verReceta(${sanitizeNumber(receta.id)})">
                             <div class="h-48 bg-gradient-to-br from-orange-400 to-pink-500 flex items-center justify-center">
                                 <i class="fas fa-utensils text-white text-6xl"></i>
                             </div>
                             <div class="p-6">
                                 <div class="flex items-center justify-between mb-2">
-                                    <h3 class="text-xl font-bold text-gray-900">${receta.titulo}</h3>
+                                    <h3 class="text-xl font-bold text-gray-900">${escapeHtml(receta.titulo)}</h3>
                                     ${receta.privacidad ? '<span class="text-xs bg-red-100 text-red-600 px-2 py-1 rounded">🔒 Privada</span>' : '<span class="text-xs bg-green-100 text-green-600 px-2 py-1 rounded">🌐 Pública</span>'}
                                 </div>
-                                <p class="text-gray-600 mb-4 line-clamp-2">${receta.descripcion || 'Sin descripción'}</p>
+                                <p class="text-gray-600 mb-4 line-clamp-2">${escapeHtml(receta.descripcion) || 'Sin descripción'}</p>
                                 <div class="flex items-center justify-between text-sm text-gray-500 mb-4">
-                                    <span><i class="far fa-clock mr-1"></i> ${receta.tiempoPreparacion} min</span>
-                                    <span><i class="far fa-user mr-1"></i> Por: ${receta.creadorUsername || 'Anónimo'}</span>
+                                    <span><i class="far fa-clock mr-1"></i> ${sanitizeNumber(receta.tiempoPreparacion)} min</span>
+                                    <span><i class="far fa-user mr-1"></i> Por: ${escapeHtml(receta.creadorUsername) || 'Anónimo'}</span>
                                 </div>
                                 ${canEdit ? `
                                     <div class="flex space-x-2">
-                                        <button onclick="event.stopPropagation(); editReceta(${receta.id})"
+                                        <button onclick="event.stopPropagation(); editReceta(${sanitizeNumber(receta.id)})"
                                                 class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
                                             <i class="fas fa-edit mr-1"></i> Editar
                                         </button>
-                                        <button onclick="event.stopPropagation(); deleteReceta(${receta.id})"
+                                        <button onclick="event.stopPropagation(); deleteReceta(${sanitizeNumber(receta.id)})"
                                                 class="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition">
                                             <i class="fas fa-trash mr-1"></i> Eliminar
                                         </button>
@@ -556,7 +583,7 @@
                     : `${API_BASE_URL}/recetas`;
                 const method = currentRecetaId ? 'PUT' : 'POST';
 
-                const response = await fetch(url, {
+                const response = await CsrfProtection.protectedFetch(url, {
                     method,
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
@@ -644,7 +671,7 @@
             if (!confirm('¿Estás seguro de eliminar esta receta?')) return;
 
             try {
-                const response = await fetch(`${API_BASE_URL}/recetas/${id}`, {
+                const response = await CsrfProtection.protectedFetch(`${API_BASE_URL}/recetas/${id}`, {
                     method: 'DELETE'
                 });
 

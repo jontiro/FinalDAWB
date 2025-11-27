@@ -118,4 +118,12 @@ public class AuthService {
         // BCrypt maneja la lógica de extracción de la sal y el hasheo/comparación internamente.
         return BCrypt.checkpw(rawPassword, hashedPassword);
     }
+
+    /**
+     * Cuenta el número de usuarios activos en el sistema.
+     * @return Número de usuarios con estado ACTIVO.
+     */
+    public long contarUsuariosActivos() {
+        return usuarioRepository.contarUsuariosActivos();
+    }
 }

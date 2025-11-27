@@ -3,10 +3,12 @@ package com.dawb.finaldawb.rest;
 import com.dawb.finaldawb.domain.Usuario;
 import com.dawb.finaldawb.rest.dto.LoginRequest;
 import com.dawb.finaldawb.rest.dto.RegistroRequest;
+import com.dawb.finaldawb.security.CsrfTokenService;
 import com.dawb.finaldawb.service.AuthService;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
@@ -19,10 +21,24 @@ import jakarta.ws.rs.core.Response;
 public class AuthResource {
 
     private final AuthService authService;
+    private final CsrfTokenService csrfTokenService;
 
     @Inject
-    public AuthResource(AuthService authService){
+    public AuthResource(AuthService authService, CsrfTokenService csrfTokenService){
         this.authService = authService;
+        this.csrfTokenService = csrfTokenService;
+    }
+
+    /**
+     * Endpoint público para obtener un token CSRF después del login.
+     * Este endpoint NO requiere token CSRF (está en la lista de exentos).
+     * @return Token CSRF válido por 24 horas.
+     */
+    @GET
+    @Path("/csrf-token")
+    public Response getCsrfToken() {
+        String token = csrfTokenService.generateToken();
+        return Response.ok(new CsrfTokenResponse(token)).build();
     }
 
     /**
@@ -79,6 +95,23 @@ public class AuthResource {
                 .build();
     }
 
+    /**
+     * Endpoint público para obtener el conteo de usuarios registrados.
+     * @return Conteo de usuarios activos.
+     */
+    @GET
+    @Path("/count")
+    public Response getUserCount() {
+        try {
+            long count = authService.contarUsuariosActivos();
+            return Response.ok(new CountResponse(count)).build();
+        } catch (Exception e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity(new ErrorResponse("Error al obtener el conteo de usuarios"))
+                    .build();
+        }
+    }
+
     // --- Mapeo de Seguridad (CRÍTICO) ---
 
     // Mapea la entidad Usuario a un DTO de respuesta para EVITAR exponer el passwordHash.
@@ -116,6 +149,24 @@ public class AuthResource {
 
         public ErrorResponse(String message) {
             this.message = message;
+        }
+    }
+
+    // DTO para respuesta de conteo
+    public static class CountResponse {
+        public long count;
+
+        public CountResponse(long count) {
+            this.count = count;
+        }
+    }
+
+    // DTO para respuesta de token CSRF
+    public static class CsrfTokenResponse {
+        public String token;
+
+        public CsrfTokenResponse(String token) {
+            this.token = token;
         }
     }
 }

@@ -96,6 +96,12 @@ function removeUser() {
  */
 function logout() {
     removeUser();
+
+    // 🔒 Limpiar token CSRF al cerrar sesión
+    if (typeof CsrfProtection !== 'undefined') {
+        CsrfProtection.clearToken();
+    }
+
     showToast('Sesión cerrada', '', 'info');
     updateNavButtons();
     
@@ -197,6 +203,15 @@ async function handleLoginSubmit(e) {
             closeLoginModal();
             updateNavButtons();
             
+            // 🔒 Inicializar protección CSRF después del login exitoso
+            if (typeof CsrfProtection !== 'undefined') {
+                CsrfProtection.initialize().then(() => {
+                    console.log('✅ Protección CSRF activada después del login');
+                }).catch(err => {
+                    console.warn('⚠️ No se pudo inicializar CSRF:', err);
+                });
+            }
+
             // Redireccionar si es admin
             if (data.role === 'ADMIN') {
                 setTimeout(() => window.location.href = 'admin.html', 1000);

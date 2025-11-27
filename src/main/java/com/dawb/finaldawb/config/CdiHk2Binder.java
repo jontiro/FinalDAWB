@@ -1,6 +1,7 @@
 package com.dawb.finaldawb.config;
 
 import com.dawb.finaldawb.repository.*;
+import com.dawb.finaldawb.security.CsrfTokenService;
 import com.dawb.finaldawb.service.*;
 import jakarta.enterprise.context.spi.CreationalContext;
 import jakarta.enterprise.inject.spi.Bean;
@@ -20,6 +21,9 @@ public class CdiHk2Binder extends AbstractBinder {
 
     @Override
     protected void configure() {
+        // ===== SECURITY =====
+        bindFactory(new CdiFactory<>(CsrfTokenService.class)).to(CsrfTokenService.class);
+
         // ===== SERVICES =====
         bindFactory(new CdiFactory<>(AuthService.class)).to(AuthService.class);
         bindFactory(new CdiFactory<>(UsuarioService.class)).to(UsuarioService.class);

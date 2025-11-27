@@ -19,6 +19,11 @@ public class RoleRepository {
         return Optional.ofNullable(em.find(Role.class, id));
     }
 
+    // Obtener todos los roles
+    public java.util.List<Role> findAll() {
+        return em.createQuery("SELECT r FROM Role r ORDER BY r.id", Role.class).getResultList();
+    }
+
     // Buscar un Role por su nombre (ej. "ADMIN")
     public Optional<Role> findByNombre(String nombre) {
         try {

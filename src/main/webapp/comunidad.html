@@ -46,21 +46,24 @@
                 Nuevo Comentario
             </h3>
             <form id="comentario-form" class="space-y-4">
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-gray-700 mb-2 font-medium">Tipo de Contenido *</label>
-                        <select id="comentario-tipo" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-600">
-                            <option value="">Seleccionar...</option>
-                            <option value="receta">Receta</option>
-                            <option value="lugar">Lugar</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-gray-700 mb-2 font-medium">ID del Contenido *</label>
-                        <input type="number" id="comentario-id-contenido" required min="1"
-                               placeholder="Ej: 9"
-                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-600">
-                    </div>
+                <div>
+                    <label class="block text-gray-700 mb-2 font-medium">Tipo de Contenido *</label>
+                    <select id="comentario-tipo" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-600">
+                        <option value="">Seleccionar tipo...</option>
+                        <option value="receta">Receta</option>
+                        <option value="lugar">Lugar</option>
+                    </select>
+                </div>
+
+                <div id="contenido-selector-container">
+                    <label class="block text-gray-700 mb-2 font-medium">Selecciona el Contenido *</label>
+                    <select id="comentario-contenido" required disabled class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-600 bg-gray-100">
+                        <option value="">Primero selecciona un tipo...</option>
+                    </select>
+                    <p class="text-sm text-gray-500 mt-1">
+                        <i class="fas fa-info-circle mr-1"></i>
+                        Selecciona el tipo de contenido para ver las opciones disponibles
+                    </p>
                 </div>
 
                 <div>
@@ -196,8 +199,25 @@
 
     <script src="assets/js/components.js"></script>
     <script src="assets/js/auth-modal.js"></script>
+    <script src="assets/js/csrf-protection.js"></script>
     <script>
         Components.loadFooter();
+
+        // ========================================
+        // FUNCIONES DE SEGURIDAD - PREVENCIÓN XSS
+        // ========================================
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function sanitizeNumber(value) {
+            const num = parseInt(value);
+            return isNaN(num) ? 0 : num;
+        }
 
         // Verificar si el usuario es admin
         function isAdmin() {
@@ -220,6 +240,79 @@
                 `;
             }
         }
+
+        // =========================================================================
+        // FUNCIONES PARA SELECTOR DINÁMICO DE CONTENIDO
+        // =========================================================================
+
+        /**
+         * Carga las opciones de recetas o lugares según el tipo seleccionado
+         */
+        async function loadContenidoOptions(tipo) {
+            const selector = document.getElementById('comentario-contenido');
+
+            selector.innerHTML = '<option value="">Cargando...</option>';
+            selector.disabled = true;
+
+            try {
+                let url = '';
+                if (tipo === 'receta') {
+                    url = `${API_BASE_URL}/recetas`;
+                } else if (tipo === 'lugar') {
+                    url = `${API_BASE_URL}/lugares`;
+                } else {
+                    selector.innerHTML = '<option value="">Selecciona un tipo primero...</option>';
+                    return;
+                }
+
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error('Error al cargar contenido');
+                }
+
+                const items = await response.json();
+
+                if (!Array.isArray(items) || items.length === 0) {
+                    selector.innerHTML = `<option value="">No hay ${tipo}s disponibles</option>`;
+                    return;
+                }
+
+                // Crear opciones con ID + Nombre
+                selector.innerHTML = `<option value="">Selecciona una ${tipo}...</option>`;
+                items.forEach(item => {
+                    const option = document.createElement('option');
+                    option.value = item.id;
+
+                    if (tipo === 'receta') {
+                        option.textContent = `#${item.id} - ${escapeHtml(item.titulo)}`;
+                    } else if (tipo === 'lugar') {
+                        option.textContent = `#${item.id} - ${escapeHtml(item.nombre)}`;
+                    }
+
+                    selector.appendChild(option);
+                });
+
+                selector.disabled = false;
+                console.log(`✅ Cargadas ${items.length} ${tipo}s en el selector`);
+
+            } catch (error) {
+                console.error('Error al cargar opciones:', error);
+                selector.innerHTML = '<option value="">Error al cargar opciones</option>';
+                showToast('Error', `No se pudieron cargar las ${tipo}s`, 'error');
+            }
+        }
+
+        // Listener para cuando cambia el tipo de contenido
+        document.getElementById('comentario-tipo').addEventListener('change', function(e) {
+            const tipo = e.target.value;
+            if (tipo) {
+                loadContenidoOptions(tipo);
+            } else {
+                const selector = document.getElementById('comentario-contenido');
+                selector.innerHTML = '<option value="">Primero selecciona un tipo...</option>';
+                selector.disabled = true;
+            }
+        });
 
         async function loadComentarios() {
             const list = document.getElementById('comentarios-list');
@@ -282,15 +375,23 @@
                     const tipoContenido = comentario.recetaId ? 'Receta' : 'Lugar';
                     const idContenido = comentario.recetaId || comentario.lugarId;
 
+                    // Mostrar nombre si está disponible
+                    let nombreContenido = '';
+                    if (comentario.recetaTitulo) {
+                        nombreContenido = escapeHtml(comentario.recetaTitulo);
+                    } else if (comentario.lugarNombre) {
+                        nombreContenido = escapeHtml(comentario.lugarNombre);
+                    }
+
                     return `
                         <div class="comment-card border border-gray-200 rounded-lg p-4">
                             <div class="flex items-start justify-between mb-2">
                                 <div class="flex items-center flex-1">
                                     <div class="w-10 h-10 bg-teal-600 rounded-full flex items-center justify-center text-white font-bold mr-3">
-                                        ${comentario.autorUsername ? comentario.autorUsername[0].toUpperCase() : 'U'}
+                                        ${escapeHtml(comentario.autorUsername ? comentario.autorUsername[0].toUpperCase() : 'U')}
                                     </div>
                                     <div class="flex-1">
-                                        <p class="font-semibold text-gray-900">${comentario.autorUsername || 'Usuario'}</p>
+                                        <p class="font-semibold text-gray-900">${escapeHtml(comentario.autorUsername) || 'Usuario'}</p>
                                         <p class="text-xs text-gray-500">
                                             <i class="far fa-clock mr-1"></i>
                                             ${comentario.fechaCreacion ? new Date(comentario.fechaCreacion).toLocaleDateString('es-ES') : 'Fecha desconocida'}
@@ -298,16 +399,17 @@
                                     </div>
                                 </div>
                                 ${canDelete ? `
-                                    <button onclick="deleteComentario(${comentario.id})"
+                                    <button onclick="deleteComentario(${sanitizeNumber(comentario.id)})"
                                             class="ml-2 px-3 py-1 bg-red-600 text-white text-sm rounded hover:bg-red-700 transition">
                                         <i class="fas fa-trash mr-1"></i> Eliminar
                                     </button>
                                 ` : ''}
                             </div>
-                            <p class="text-gray-700 mb-2">${comentario.texto || 'Sin texto'}</p>
+                            <p class="text-gray-700 mb-2">${escapeHtml(comentario.texto) || 'Sin texto'}</p>
                             <p class="text-xs text-gray-400">
                                 <i class="fas fa-tag mr-1"></i>
-                                ${tipoContenido} #${idContenido}
+                                ${tipoContenido} #${sanitizeNumber(idContenido)}
+                                ${nombreContenido ? ` - ${nombreContenido}` : ''}
                             </p>
                         </div>
                     `;
@@ -336,7 +438,7 @@
             }
 
             try {
-                const response = await fetch(`${API_BASE_URL}/comentarios/${id}`, {
+                const response = await CsrfProtection.protectedFetch(`${API_BASE_URL}/comentarios/${id}`, {
                     method: 'DELETE'
                 });
 
@@ -364,8 +466,19 @@
             }
 
             const tipo = document.getElementById('comentario-tipo').value;
-            const idContenido = parseInt(document.getElementById('comentario-id-contenido').value);
+            const idContenido = parseInt(document.getElementById('comentario-contenido').value);
             const texto = document.getElementById('comentario-texto').value;
+
+            // Validaciones
+            if (!tipo) {
+                showToast('Error', 'Selecciona el tipo de contenido', 'error');
+                return;
+            }
+
+            if (!idContenido || isNaN(idContenido)) {
+                showToast('Error', 'Selecciona un contenido válido', 'error');
+                return;
+            }
 
             // Construir payload según el tipo
             const payload = {
@@ -383,7 +496,7 @@
             console.log('Payload a enviar:', JSON.stringify(payload, null, 2));
 
             try {
-                const response = await fetch(`${API_BASE_URL}/comentarios`, {
+                const response = await CsrfProtection.protectedFetch(`${API_BASE_URL}/comentarios`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)

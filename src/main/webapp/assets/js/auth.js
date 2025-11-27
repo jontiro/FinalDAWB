@@ -44,7 +44,7 @@ const Auth = {
         if (user) {
             navButtons.innerHTML = `
                 <div class="flex items-center space-x-4">
-                    ${user.role === 'ADMIN' ? '<a href="admin.html" class="text-gray-700 hover:text-purple-600 transition"><i class="fas fa-cog mr-1"></i> Admin</a>' : ''}
+                    ${user.role === 'ADMIN' ? '<a href="admin/dashboard.html" class="text-gray-700 hover:text-purple-600 transition"><i class="fas fa-cog mr-1"></i> Admin</a>' : ''}
                     <span class="text-gray-700">Hola, <strong>${user.username}</strong></span>
                     <button onclick="Auth.logout()" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition">
                         Cerrar Sesión
@@ -108,7 +108,7 @@ async function handleLogin(e) {
             
             // Redireccionar según rol
             if (data.role === 'ADMIN') {
-                setTimeout(() => window.location.href = 'admin.html', 1000);
+                setTimeout(() => window.location.href = 'admin/dashboard.html', 1000);
             }
         } else {
             Utils.showToast('Error de autenticación', data.message || 'Credenciales incorrectas', 'error');

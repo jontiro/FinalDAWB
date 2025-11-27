@@ -226,10 +226,27 @@
 
     <script src="assets/js/components.js"></script>
     <script src="assets/js/auth-modal.js"></script>
+    <script src="assets/js/csrf-protection.js"></script>
     <script>
         Components.loadFooter();
 
         let currentLugarId = null;
+
+        // ========================================
+        // FUNCIONES DE SEGURIDAD - PREVENCIÓN XSS
+        // ========================================
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function sanitizeNumber(value) {
+            const num = parseInt(value);
+            return isNaN(num) ? 0 : num;
+        }
 
         // Verificar si el usuario es admin
         function isAdmin() {
@@ -280,7 +297,7 @@
                                 <div>
                                     <h3 class="text-3xl font-bold text-gray-900 mb-2">
                                         <i class="fas fa-map-marker-alt text-pink-600 mr-2"></i>
-                                        ${lugar.nombre}
+                                        ${escapeHtml(lugar.nombre)}
                                     </h3>
                                 </div>
                             </div>
@@ -290,7 +307,7 @@
                                     <i class="fas fa-map-pin text-pink-600 mr-3 mt-1 text-lg"></i>
                                     <div>
                                         <p class="text-gray-700 font-medium">Dirección</p>
-                                        <p class="text-gray-600">${lugar.direccion}</p>
+                                        <p class="text-gray-600">${escapeHtml(lugar.direccion)}</p>
                                     </div>
                                 </div>
 
@@ -299,7 +316,7 @@
                                         <i class="fas fa-city text-pink-600 mr-3 mt-1 text-lg"></i>
                                         <div>
                                             <p class="text-gray-700 font-medium">Ciudad</p>
-                                            <p class="text-gray-600">${lugar.ciudad}${lugar.pais ? ', ' + lugar.pais : ''}</p>
+                                            <p class="text-gray-600">${escapeHtml(lugar.ciudad)}${lugar.pais ? ', ' + escapeHtml(lugar.pais) : ''}</p>
                                         </div>
                                     </div>
                                 ` : ''}
@@ -308,18 +325,18 @@
                                     <i class="far fa-user text-pink-600 mr-3 mt-1 text-lg"></i>
                                     <div>
                                         <p class="text-gray-700 font-medium">Recomendado por</p>
-                                        <p class="text-gray-600">${lugar.autorUsername || 'Anónimo'}</p>
+                                        <p class="text-gray-600">${escapeHtml(lugar.autorUsername) || 'Anónimo'}</p>
                                     </div>
                                 </div>
                             </div>
 
                             ${canEdit ? `
                                 <div class="flex space-x-3 pt-4 border-t">
-                                    <button onclick="closeVerLugarModal(); editLugar(${lugar.id})"
+                                    <button onclick="closeVerLugarModal(); editLugar(${sanitizeNumber(lugar.id)})"
                                             class="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-semibold">
                                         <i class="fas fa-edit mr-2"></i> Editar Lugar
                                     </button>
-                                    <button onclick="closeVerLugarModal(); deleteLugar(${lugar.id})"
+                                    <button onclick="closeVerLugarModal(); deleteLugar(${sanitizeNumber(lugar.id)})"
                                             class="flex-1 px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition font-semibold">
                                         <i class="fas fa-trash mr-2"></i> Eliminar
                                     </button>
@@ -368,31 +385,31 @@
                     const canEdit = user && (lugar.autorId === user.id || isAdmin());
                     return `
                         <div class="lugar-card bg-white rounded-2xl shadow-lg overflow-hidden cursor-pointer hover:shadow-2xl transition-shadow duration-300"
-                             onclick="verLugar(${lugar.id})">
+                             onclick="verLugar(${sanitizeNumber(lugar.id)})">
                             <div class="h-40 bg-gradient-to-br from-pink-400 to-purple-500 flex items-center justify-center">
                                 <i class="fas fa-map-marker-alt text-white text-5xl"></i>
                             </div>
                             <div class="p-6">
-                                <h3 class="text-xl font-bold text-gray-900 mb-2">${lugar.nombre}</h3>
+                                <h3 class="text-xl font-bold text-gray-900 mb-2">${escapeHtml(lugar.nombre)}</h3>
                                 <p class="text-gray-600 mb-2 flex items-start">
                                     <i class="fas fa-map-pin text-pink-600 mr-2 mt-1"></i>
-                                    <span>${lugar.direccion}</span>
+                                    <span>${escapeHtml(lugar.direccion)}</span>
                                 </p>
                                 ${lugar.ciudad ? `
                                     <p class="text-sm text-gray-500 mb-4">
-                                        <i class="fas fa-city mr-2"></i>${lugar.ciudad}${lugar.pais ? ', ' + lugar.pais : ''}
+                                        <i class="fas fa-city mr-2"></i>${escapeHtml(lugar.ciudad)}${lugar.pais ? ', ' + escapeHtml(lugar.pais) : ''}
                                     </p>
                                 ` : ''}
                                 <p class="text-xs text-gray-400 mb-4">
-                                    <i class="far fa-user mr-1"></i> Recomendado por: ${lugar.autorUsername || 'Anónimo'}
+                                    <i class="far fa-user mr-1"></i> Recomendado por: ${escapeHtml(lugar.autorUsername) || 'Anónimo'}
                                 </p>
                                 ${canEdit ? `
                                     <div class="flex space-x-2">
-                                        <button onclick="event.stopPropagation(); editLugar(${lugar.id})"
+                                        <button onclick="event.stopPropagation(); editLugar(${sanitizeNumber(lugar.id)})"
                                                 class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
                                             <i class="fas fa-edit mr-1"></i> Editar
                                         </button>
-                                        <button onclick="event.stopPropagation(); deleteLugar(${lugar.id})"
+                                        <button onclick="event.stopPropagation(); deleteLugar(${sanitizeNumber(lugar.id)})"
                                                 class="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition">
                                             <i class="fas fa-trash mr-1"></i> Eliminar
                                         </button>
@@ -435,7 +452,7 @@
                     : `${API_BASE_URL}/lugares`;
                 const method = currentLugarId ? 'PUT' : 'POST';
 
-                const response = await fetch(url, {
+                const response = await CsrfProtection.protectedFetch(url, {
                     method,
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
@@ -480,7 +497,7 @@
             if (!confirm('¿Estás seguro de eliminar este lugar?')) return;
 
             try {
-                const response = await fetch(`${API_BASE_URL}/lugares/${id}`, {
+                const response = await CsrfProtection.protectedFetch(`${API_BASE_URL}/lugares/${id}`, {
                     method: 'DELETE'
                 });
 

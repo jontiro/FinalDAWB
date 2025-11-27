@@ -13,7 +13,8 @@ let currentData = {
 // Verificar autenticación al cargar
 document.addEventListener('DOMContentLoaded', () => {
     if (!isAuthenticated()) {
-        window.location.href = '../index.html';
+        alert('Acceso denegado. Solo administradores pueden acceder a esta página.');
+        window.location.href = '../home.html';
         return;
     }
 
@@ -633,11 +634,19 @@ function showNotification(message, type = 'info') {
 function logout() {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
-    window.location.href = '../index.html';
+    window.location.href = '../home.html';
 }
 
 function isAuthenticated() {
-    return !!localStorage.getItem('token');
+    const user = localStorage.getItem('user');
+    if (!user) return false;
+
+    try {
+        const userData = JSON.parse(user);
+        return userData && userData.role === 'ADMIN';
+    } catch (e) {
+        return false;
+    }
 }
 
 // Agregar estilos para animaciones

@@ -82,7 +82,7 @@
                     <div class="text-purple-200">Lugares Recomendados</div>
                 </div>
                 <div class="stat-card text-center p-6 rounded-xl text-white">
-                    <div class="text-4xl font-bold mb-2">500+</div>
+                    <div class="text-4xl font-bold mb-2" id="stat-usuarios">500+</div>
                     <div class="text-purple-200">Usuarios Activos</div>
                 </div>
                 <div class="stat-card text-center p-6 rounded-xl text-white">
@@ -245,16 +245,38 @@
         async function loadStats() {
             // API_BASE_URL ya está definido en auth-modal.js
             try {
-                const [recetas, lugares] = await Promise.all([
-                    fetch(`${API_BASE_URL}/recetas`).then(r => r.json()),
-                    fetch(`${API_BASE_URL}/lugares`).then(r => r.json())
+                const [recetas, lugares, comentarios, usuariosData] = await Promise.all([
+                    fetch(`${API_BASE_URL}/recetas`).then(r => r.ok ? r.json() : []).catch(() => []),
+                    fetch(`${API_BASE_URL}/lugares`).then(r => r.ok ? r.json() : []).catch(() => []),
+                    fetch(`${API_BASE_URL}/comentarios`).then(r => r.ok ? r.json() : []).catch(() => []),
+                    fetch(`${API_BASE_URL}/auth/count`).then(r => r.ok ? r.json() : null).catch(() => null)
                 ]);
+
+                console.log('Estadísticas cargadas:', {
+                    recetas: recetas.length,
+                    lugares: lugares.length,
+                    comentarios: comentarios.length,
+                    usuarios: usuariosData ? usuariosData.count : 'N/A'
+                });
 
                 animateCounter('stat-recetas', recetas.length);
                 animateCounter('stat-lugares', lugares.length);
-                animateCounter('stat-comentarios', Math.floor(Math.random() * 200) + 100);
+                animateCounter('stat-comentarios', comentarios.length);
+
+                // Actualizar usuarios con el conteo real
+                if (usuariosData && usuariosData.count !== undefined) {
+                    animateCounter('stat-usuarios', usuariosData.count);
+                } else {
+                    // Si no se pudo cargar, mostrar un valor placeholder
+                    document.getElementById('stat-usuarios').textContent = '500+';
+                }
             } catch (error) {
                 console.error('Error loading stats:', error);
+                // En caso de error, mostrar 0
+                document.getElementById('stat-recetas').textContent = '0';
+                document.getElementById('stat-lugares').textContent = '0';
+                document.getElementById('stat-comentarios').textContent = '0';
+                document.getElementById('stat-usuarios').textContent = '500+';
             }
         }
 

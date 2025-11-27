@@ -81,4 +81,13 @@ public class UsuarioRepository {
             return Optional.empty();
         }
     }
+
+    /**
+     * Cuenta el número de usuarios activos en el sistema.
+     * @return Número de usuarios con estado ACTIVO.
+     */
+    public long contarUsuariosActivos() {
+        return em.createQuery("SELECT COUNT(u) FROM Usuario u WHERE u.estado = com.dawb.finaldawb.domain.EstadoUsuario.ACTIVO", Long.class)
+                .getSingleResult();
+    }
 }
