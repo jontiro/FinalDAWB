@@ -43,9 +43,11 @@
         <div class="bg-white rounded-lg shadow-lg p-6">
             <div class="grid md:grid-cols-4 gap-4">
                 <input type="text" id="search-input" placeholder="🔍 Buscar lugares..."
-                       class="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-600">
+                       class="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-600"
+                       onkeypress="if(event.key === 'Enter') loadLugares()">
                 <input type="text" id="filter-ciudad" placeholder="Ciudad"
-                       class="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-600">
+                       class="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-600"
+                       onkeypress="if(event.key === 'Enter') loadLugares()">
                 <button onclick="loadLugares()" class="px-6 py-3 bg-pink-600 text-white rounded-lg hover:bg-pink-700 transition">
                     <i class="fas fa-search mr-2"></i> Buscar
                 </button>
@@ -365,8 +367,29 @@
             grid.innerHTML = '<div class="col-span-3 text-center py-12"><i class="fas fa-spinner fa-spin text-4xl text-pink-600"></i></div>';
 
             try {
+                // Obtener valores de búsqueda y filtros
+                const searchTerm = document.getElementById('search-input').value.trim();
+                const ciudadFilter = document.getElementById('filter-ciudad').value.trim();
+
                 const response = await fetch(`${API_BASE_URL}/lugares`);
-                const lugares = await response.json();
+                let lugares = await response.json();
+
+                // Aplicar filtro de búsqueda por texto
+                if (searchTerm) {
+                    lugares = lugares.filter(lugar =>
+                        lugar.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                        (lugar.direccion && lugar.direccion.toLowerCase().includes(searchTerm.toLowerCase())) ||
+                        (lugar.ciudad && lugar.ciudad.toLowerCase().includes(searchTerm.toLowerCase())) ||
+                        (lugar.pais && lugar.pais.toLowerCase().includes(searchTerm.toLowerCase()))
+                    );
+                }
+
+                // Aplicar filtro por ciudad
+                if (ciudadFilter) {
+                    lugares = lugares.filter(lugar =>
+                        lugar.ciudad && lugar.ciudad.toLowerCase().includes(ciudadFilter.toLowerCase())
+                    );
+                }
 
                 if (lugares.length === 0) {
                     grid.innerHTML = `

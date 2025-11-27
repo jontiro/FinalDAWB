@@ -55,6 +55,16 @@ public class AdminResource {
                 .collect(Collectors.toList());
     }
 
+    @GET
+    @Path("/usuarios/{id}")
+    public Response getUsuarioById(@PathParam("id") Long id) {
+        return usuarioService.findById(id)
+                .map(UsuarioResponse::fromEntity)
+                .map(Response::ok)
+                .orElse(Response.status(Response.Status.NOT_FOUND))
+                .build();
+    }
+
     @POST
     @Path("/usuarios")
     public Response createUsuario(UsuarioRequest request) {

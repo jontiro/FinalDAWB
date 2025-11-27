@@ -318,7 +318,7 @@ window.verUsuario = async function(id) {
                 </div>
                 <div><p class="text-sm text-gray-500">Email</p><p class="text-lg">${escapeHtml(u.email)}</p></div>
                 <div class="grid grid-cols-2 gap-4">
-                    <div><p class="text-sm text-gray-500">Rol</p><p class="text-lg font-semibold ${u.role === 'ADMIN' ? 'text-blue-600' : 'text-gray-600'}">${u.role}</p></div>
+                    <div><p class="text-sm text-gray-500">Rol</p><p class="text-lg font-semibold ${u.roleNombre === 'ADMIN' ? 'text-blue-600' : 'text-gray-600'}">${u.roleNombre || 'N/A'}</p></div>
                     <div><p class="text-sm text-gray-500">Estado</p><p class="text-lg font-semibold ${u.estado === 'ACTIVO' ? 'text-green-600' : 'text-red-600'}">${u.estado}</p></div>
                 </div>
             </div>

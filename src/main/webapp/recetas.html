@@ -43,8 +43,10 @@
         <div class="bg-white rounded-lg shadow-lg p-6">
             <div class="grid md:grid-cols-4 gap-4">
                 <input type="text" id="search-input" placeholder="🔍 Buscar recetas..."
-                       class="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
-                <select id="filter-privacidad" class="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600">
+                       class="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600"
+                       onkeypress="if(event.key === 'Enter') loadRecetas()">
+                <select id="filter-privacidad" class="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600"
+                        onchange="loadRecetas()">
                     <option value="">Todas las recetas</option>
                     <option value="false">Solo públicas</option>
                     <option value="true">Solo privadas</option>
@@ -475,8 +477,26 @@
             grid.innerHTML = '<div class="col-span-3 text-center py-12"><i class="fas fa-spinner fa-spin text-4xl text-purple-600"></i></div>';
 
             try {
+                // Obtener valores de búsqueda y filtros
+                const searchTerm = document.getElementById('search-input').value.trim();
+                const privacidadFilter = document.getElementById('filter-privacidad').value;
+
                 const response = await fetch(`${API_BASE_URL}/recetas`);
-                const recetas = await response.json();
+                let recetas = await response.json();
+
+                // Aplicar filtro de búsqueda por texto
+                if (searchTerm) {
+                    recetas = recetas.filter(receta =>
+                        receta.titulo.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                        (receta.descripcion && receta.descripcion.toLowerCase().includes(searchTerm.toLowerCase()))
+                    );
+                }
+
+                // Aplicar filtro de privacidad
+                if (privacidadFilter !== '') {
+                    const privacidadBool = privacidadFilter === 'true';
+                    recetas = recetas.filter(receta => receta.privacidad === privacidadBool);
+                }
 
                 if (recetas.length === 0) {
                     grid.innerHTML = `

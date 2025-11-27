@@ -357,11 +357,15 @@
                     comentarios = [];
                 }
 
-                if (comentarios.length === 0) {
+                // Filtrar solo comentarios visibles (moderado=false/0 en BD)
+                const comentariosVisibles = comentarios.filter(c => c.moderado === false);
+                console.log(`Comentarios totales: ${comentarios.length}, Visibles: ${comentariosVisibles.length}`);
+
+                if (comentariosVisibles.length === 0) {
                     list.innerHTML = `
                         <div class="text-center py-12">
                             <i class="fas fa-comment-slash text-6xl text-gray-300 mb-4"></i>
-                            <p class="text-gray-600 text-lg">No hay comentarios aún.</p>
+                            <p class="text-gray-600 text-lg">No hay comentarios visibles aún.</p>
                             <p class="text-gray-500">¡Sé el primero en comentar!</p>
                         </div>
                     `;
@@ -370,7 +374,7 @@
 
                 const user = getUser();
 
-                list.innerHTML = comentarios.map(comentario => {
+                list.innerHTML = comentariosVisibles.map(comentario => {
                     const canDelete = user && (comentario.usuarioId === user.id || isAdmin());
                     const tipoContenido = comentario.recetaId ? 'Receta' : 'Lugar';
                     const idContenido = comentario.recetaId || comentario.lugarId;
@@ -415,7 +419,7 @@
                     `;
                 }).join('');
 
-                showToast('Comentarios cargados', `${comentarios.length} comentario(s)`, 'success');
+                showToast('Comentarios cargados', `${comentariosVisibles.length} comentario(s) visible(s)`, 'success');
             } catch (error) {
                 console.error('Error al cargar comentarios:', error);
                 list.innerHTML = `
