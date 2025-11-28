@@ -94,42 +94,53 @@ public class LugarResource {
      * PUT /lugares/{id} : Actualiza un lugar existente.
      * @param id ID del lugar a actualizar.
      * @param lugar Objeto Lugar con los datos a actualizar.
+     * @param userId ID del usuario que intenta actualizar (desde header X-User-Id).
      * @return 200 OK con el lugar actualizado o 404 NOT FOUND/403 FORBIDDEN.
      */
     @PUT
     @Path("/{id}")
-    public Response updateLugar(@PathParam("id") Long id, Lugar lugar) {
-        // SIMULACIÓN DE SEGURIDAD: ID del usuario loggeado
-        Long currentUserId = 1L;
+    public Response updateLugar(@PathParam("id") Long id, Lugar lugar, @HeaderParam("X-User-Id") Long userId) {
+        // Si no se proporciona el header, retornar error
+        if (userId == null) {
+            return Response.status(Response.Status.UNAUTHORIZED)
+                    .entity("{\"error\": \"Usuario no autenticado. Debe proporcionar el header X-User-Id.\"}")
+                    .build();
+        }
 
         lugar.setId(id); // Asegura que el ID del objeto coincida con el path
 
-        // CORRECCIÓN 4: Pasar el currentUserId para la verificación de permisos
-        return lugarService.updateLugar(lugar, currentUserId)
+        // Llamar al servicio con el userId del header
+        return lugarService.updateLugar(lugar, userId)
                 .map(LugarResponse::fromEntity)
                 .map(lugarResponse -> Response.ok(lugarResponse).build())
                 .orElse(Response.status(Response.Status.FORBIDDEN)
-                        .entity("Lugar no encontrado o no autorizado para editar.").build());
+                        .entity("{\"error\": \"Lugar no encontrado o no autorizado para editar.\"}")
+                        .build());
     }
 
     /**
      * DELETE /lugares/{id} : Elimina un lugar por su ID.
      * @param id ID del lugar a eliminar.
-     * @return 204 No Content si se eliminó, 404 Not Found si no existe.
+     * @param userId ID del usuario que intenta eliminar (desde header X-User-Id).
+     * @return 204 No Content si se eliminó, 404 Not Found si no existe o no autorizado.
      */
     @DELETE
     @Path("/{id}")
-    public Response deleteLugar(@PathParam("id") Long id) {
-        // SIMULACIÓN DE SEGURIDAD: ID del usuario loggeado
-        Long currentUserId = 1L;
+    public Response deleteLugar(@PathParam("id") Long id, @HeaderParam("X-User-Id") Long userId) {
+        // Si no se proporciona el header, intentar con un valor por defecto
+        if (userId == null) {
+            return Response.status(Response.Status.UNAUTHORIZED)
+                    .entity("{\"error\": \"Usuario no autenticado. Debe proporcionar el header X-User-Id.\"}")
+                    .build();
+        }
 
-        // CORRECCIÓN 5: Pasar el currentUserId para la verificación de permisos
-        if (lugarService.deleteLugar(id, currentUserId)) {
+        // Llamar al servicio para eliminar
+        if (lugarService.deleteLugar(id, userId)) {
             // Retorna 204 No Content al eliminar exitosamente
             return Response.noContent().build();
         } else {
             return Response.status(Response.Status.NOT_FOUND)
-                    .entity("Lugar no encontrado o no autorizado para eliminar.")
+                    .entity("{\"error\": \"Lugar no encontrado o no autorizado para eliminar.\"}")
                     .build();
         }
     }

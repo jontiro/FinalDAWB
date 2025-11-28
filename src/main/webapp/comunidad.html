@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Comunidad - Cocina Social</title>
+    <title>Comunidad - Manger</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="assets/css/common.css">
@@ -17,7 +17,7 @@
             <div class="flex justify-between items-center h-16">
                 <div class="flex items-center">
                     <i class="fas fa-utensils text-3xl text-purple-600 mr-3"></i>
-                    <span class="text-2xl font-bold text-purple-600">Cocina Social</span>
+                    <span class="text-2xl font-bold text-purple-600">Manger</span>
                 </div>
                 <div class="hidden md:flex space-x-8">
                     <a href="home.html" class="text-gray-700 hover:text-purple-600 transition">Inicio</a>
@@ -349,23 +349,28 @@
                     throw new Error('Respuesta inválida del servidor');
                 }
 
-                console.log('Comentarios recibidos:', comentarios);
+                console.log('✅ Comentarios recibidos:', comentarios);
+                console.log('Tipo de datos:', typeof comentarios);
+                console.log('Es array?', Array.isArray(comentarios));
 
                 // Verificar si es un array
                 if (!Array.isArray(comentarios)) {
-                    console.warn('La respuesta no es un array:', comentarios);
+                    console.warn('⚠️ La respuesta no es un array:', comentarios);
                     comentarios = [];
                 }
 
-                // Filtrar solo comentarios visibles (moderado=false/0 en BD)
-                const comentariosVisibles = comentarios.filter(c => c.moderado === false);
-                console.log(`Comentarios totales: ${comentarios.length}, Visibles: ${comentariosVisibles.length}`);
+                console.log(`📊 Total de comentarios: ${comentarios.length}`);
 
-                if (comentariosVisibles.length === 0) {
+                // Log de cada comentario individual
+                if (comentarios.length > 0) {
+                    console.log('📝 Primer comentario:', comentarios[0]);
+                }
+
+                if (comentarios.length === 0) {
                     list.innerHTML = `
                         <div class="text-center py-12">
                             <i class="fas fa-comment-slash text-6xl text-gray-300 mb-4"></i>
-                            <p class="text-gray-600 text-lg">No hay comentarios visibles aún.</p>
+                            <p class="text-gray-600 text-lg">No hay comentarios aún.</p>
                             <p class="text-gray-500">¡Sé el primero en comentar!</p>
                         </div>
                     `;
@@ -374,18 +379,12 @@
 
                 const user = getUser();
 
-                list.innerHTML = comentariosVisibles.map(comentario => {
-                    const canDelete = user && (comentario.usuarioId === user.id || isAdmin());
-                    const tipoContenido = comentario.recetaId ? 'Receta' : 'Lugar';
-                    const idContenido = comentario.recetaId || comentario.lugarId;
-
-                    // Mostrar nombre si está disponible
-                    let nombreContenido = '';
-                    if (comentario.recetaTitulo) {
-                        nombreContenido = escapeHtml(comentario.recetaTitulo);
-                    } else if (comentario.lugarNombre) {
-                        nombreContenido = escapeHtml(comentario.lugarNombre);
-                    }
+                list.innerHTML = comentarios.map(comentario => {
+                    // El backend devuelve 'autorId' no 'usuarioId'
+                    const canDelete = user && (comentario.autorId === user.id || isAdmin());
+                    // Por ahora solo tenemos recetaId en el response
+                    const tipoContenido = 'Receta';
+                    const idContenido = comentario.recetaId;
 
                     return `
                         <div class="comment-card border border-gray-200 rounded-lg p-4">
@@ -413,13 +412,12 @@
                             <p class="text-xs text-gray-400">
                                 <i class="fas fa-tag mr-1"></i>
                                 ${tipoContenido} #${sanitizeNumber(idContenido)}
-                                ${nombreContenido ? ` - ${nombreContenido}` : ''}
                             </p>
                         </div>
                     `;
                 }).join('');
 
-                showToast('Comentarios cargados', `${comentariosVisibles.length} comentario(s) visible(s)`, 'success');
+                showToast('Comentarios cargados', `${comentarios.length} comentario(s)`, 'success');
             } catch (error) {
                 console.error('Error al cargar comentarios:', error);
                 list.innerHTML = `

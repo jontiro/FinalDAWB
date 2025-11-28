@@ -99,7 +99,22 @@ public class LugarService {
         try {
             Optional<Lugar> existingLugarOpt = lugarRepository.findById(lugar.getId());
 
-            if (existingLugarOpt.isEmpty() || !existingLugarOpt.get().getAutor().getId().equals(autorId)) {
+            if (existingLugarOpt.isEmpty()) {
+                em.getTransaction().rollback();
+                return Optional.empty();
+            }
+
+            // Verificar si el usuario es el autor
+            boolean isAuthor = existingLugarOpt.get().getAutor().getId().equals(autorId);
+
+            // Verificar si el usuario es admin
+            Optional<Usuario> usuarioOpt = usuarioRepository.findById(autorId);
+            boolean isAdmin = usuarioOpt.isPresent() &&
+                            usuarioOpt.get().getRole() != null &&
+                            "ADMIN".equals(usuarioOpt.get().getRole().getNombre());
+
+            // Permitir actualizar si es el autor o si es admin
+            if (!isAuthor && !isAdmin) {
                 em.getTransaction().rollback();
                 return Optional.empty();
             }
@@ -123,7 +138,7 @@ public class LugarService {
     }
 
     /**
-     * Elimina un lugar por ID, verificando que el autor sea el correcto.
+     * Elimina un lugar por ID, verificando que el autor sea el correcto o que sea admin.
      * @param id ID del lugar a eliminar.
      * @param autorId ID del usuario que intenta eliminarlo.
      * @return true si fue eliminado.
@@ -133,7 +148,22 @@ public class LugarService {
         try {
             Optional<Lugar> lugarOpt = lugarRepository.findById(id);
 
-            if (lugarOpt.isEmpty() || !lugarOpt.get().getAutor().getId().equals(autorId)) {
+            if (lugarOpt.isEmpty()) {
+                em.getTransaction().rollback();
+                return false;
+            }
+
+            // Verificar si el usuario es el autor
+            boolean isAuthor = lugarOpt.get().getAutor().getId().equals(autorId);
+
+            // Verificar si el usuario es admin
+            Optional<Usuario> usuarioOpt = usuarioRepository.findById(autorId);
+            boolean isAdmin = usuarioOpt.isPresent() &&
+                            usuarioOpt.get().getRole() != null &&
+                            "ADMIN".equals(usuarioOpt.get().getRole().getNombre());
+
+            // Permitir eliminar si es el autor o si es admin
+            if (!isAuthor && !isAdmin) {
                 em.getTransaction().rollback();
                 return false;
             }

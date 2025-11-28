@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lugares - Cocina Social</title>
+    <title>Lugares - Manger</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="assets/css/common.css">
@@ -17,7 +17,7 @@
             <div class="flex justify-between items-center h-16">
                 <div class="flex items-center">
                     <i class="fas fa-utensils text-3xl text-purple-600 mr-3"></i>
-                    <span class="text-2xl font-bold text-purple-600">Cocina Social</span>
+                    <span class="text-2xl font-bold text-purple-600">Manger</span>
                 </div>
                 <div class="hidden md:flex space-x-8">
                     <a href="home.html" class="text-gray-700 hover:text-purple-600 transition">Inicio</a>
@@ -116,9 +116,7 @@
         </div>
     </div>
 
-    "usuarioId": {{ user_id }},
-    "texto": "Delicioso",
-    "recetaId": 9    <!-- Modal Ver Lugar -->
+    <!-- Modal Ver Lugar -->
     <div id="ver-lugar-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl max-w-2xl w-full p-8 relative max-h-[90vh] overflow-y-auto">
             <button onclick="closeVerLugarModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
@@ -475,9 +473,16 @@
                     : `${API_BASE_URL}/lugares`;
                 const method = currentLugarId ? 'PUT' : 'POST';
 
+                const headers = { 'Content-Type': 'application/json' };
+
+                // Agregar X-User-Id para operaciones PUT (actualización)
+                if (currentLugarId) {
+                    headers['X-User-Id'] = user.id;
+                }
+
                 const response = await CsrfProtection.protectedFetch(url, {
                     method,
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: headers,
                     body: JSON.stringify(payload)
                 });
 
@@ -519,18 +524,29 @@
         async function deleteLugar(id) {
             if (!confirm('¿Estás seguro de eliminar este lugar?')) return;
 
+            const user = getUser();
+            if (!user) {
+                showToast('Error', 'Debes iniciar sesión', 'error');
+                return;
+            }
+
             try {
                 const response = await CsrfProtection.protectedFetch(`${API_BASE_URL}/lugares/${id}`, {
-                    method: 'DELETE'
+                    method: 'DELETE',
+                    headers: {
+                        'X-User-Id': user.id
+                    }
                 });
 
                 if (response.ok) {
                     showToast('Eliminado', 'Lugar eliminado correctamente', 'success');
                     loadLugares();
                 } else {
-                    showToast('Error', 'No se pudo eliminar el lugar', 'error');
+                    const data = await response.json().catch(() => ({}));
+                    showToast('Error', data.error || 'No se pudo eliminar el lugar', 'error');
                 }
             } catch (error) {
+                console.error('Error al eliminar lugar:', error);
                 showToast('Error', 'No se pudo eliminar el lugar', 'error');
             }
         }
